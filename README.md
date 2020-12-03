@@ -17,6 +17,7 @@ Provides ordered, live thread visualisation inside console using [jansi](http://
   ```
 
 ```xml
+    <!-- https://github.com/Osiris-Team/Better-Thread -->
 	<dependency>
 	    <groupId>com.github.Osiris-Team</groupId>
 	    <artifactId>Better-Thread</artifactId>
@@ -38,6 +39,7 @@ Provides ordered, live thread visualisation inside console using [jansi](http://
 
 ```gradle
 	dependencies {
+            // https://github.com/Osiris-Team/Better-Thread
 	        implementation 'com.github.Osiris-Team:Better-Thread:0.1'
 	}
 ```
