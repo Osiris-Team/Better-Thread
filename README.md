@@ -1,5 +1,5 @@
 # Better-Thread
-Provides ordered, live thread visualisation inside console using jansi.
+Provides ordered, live thread visualisation inside console using [jansi](http://fusesource.github.io/jansi/).
 
 ## Features
 
