@@ -1,6 +1,7 @@
 # Better-Thread
 [![](https://jitpack.io/v/Osiris-Team/Better-Thread.svg)](https://jitpack.io/#Osiris-Team/Better-Thread)
 [![](https://jitci.com/gh/Osiris-Team/Better-Thread/svg)](https://jitci.com/gh/Osiris-Team/Better-Thread)
+
 Provides ordered, live thread visualisation inside console using [jansi](http://fusesource.github.io/jansi/).
 
 ## Features
