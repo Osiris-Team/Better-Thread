@@ -20,7 +20,7 @@ Provides ordered, live thread visualisation inside console using jansi.
 	<dependency>
 	    <groupId>com.github.Osiris-Team</groupId>
 	    <artifactId>Better-Thread</artifactId>
-	    <version>-SNAPSHOT</version>
+	    <version>0.1</version>
 	</dependency>
 ```
 </details>
@@ -38,7 +38,7 @@ Provides ordered, live thread visualisation inside console using jansi.
 
 ```gradle
 	dependencies {
-	        implementation 'com.github.Osiris-Team:Better-Thread:-SNAPSHOT'
+	        implementation 'com.github.Osiris-Team:Better-Thread:0.1'
 	}
 ```
 </details>
