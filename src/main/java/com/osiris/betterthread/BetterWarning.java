@@ -8,9 +8,7 @@
 
 package com.osiris.betterthread;
 
-import java.io.OutputStream;
-
-public class Warning {
+public class BetterWarning {
 
     private BetterThread thread;
     private Exception e;
@@ -24,11 +22,11 @@ public class Warning {
      * @param thread pass over the thread, so we can get its name.
      * @param e the Exception.
      */
-    public Warning(BetterThread thread, Exception e) {
+    public BetterWarning(BetterThread thread, Exception e) {
         this(thread, e, null);
     }
 
-    public Warning(BetterThread thread, Exception e, String extraInfo){
+    public BetterWarning(BetterThread thread, Exception e, String extraInfo){
         this.thread = thread;
         this.e = e;
         this.extraInfo = extraInfo;

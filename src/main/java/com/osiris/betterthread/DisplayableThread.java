@@ -57,6 +57,6 @@ public interface DisplayableThread {
      * Warnings are errors that occurred during execution.
      * @return null if there were no warnings.
      */
-    List<Warning> getWarnings();
+    List<BetterWarning> getWarnings();
 
 }

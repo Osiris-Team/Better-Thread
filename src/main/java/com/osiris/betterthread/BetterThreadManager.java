@@ -15,8 +15,8 @@ import java.util.List;
  * and inactive threads.
  */
 public class BetterThreadManager {
-    private List<BetterThread> all = new ArrayList<>();;
-    private List<BetterThread> active = new ArrayList<>();;
+    private List<BetterThread> all = new ArrayList<>();
+    private List<BetterThread> active = new ArrayList<>();
 
     /**
      * A list containing all current and finished threads.

@@ -26,7 +26,8 @@ public class BetterThread extends Thread implements DisplayableThread {
     private BetterThreadManager manager;
     private boolean autoStart;
     private boolean autoFinish;
-    private List warnings = null; // Don't call this field directly or null-pointer exception. Use the method getWarnings() instead!
+    private List<BetterWarning> betterWarnings = new ArrayList<>();
+    private List<String> summary = new ArrayList();
 
     /**
      * Creates a new thread and runs it.
@@ -85,9 +86,19 @@ public class BetterThread extends Thread implements DisplayableThread {
     }
 
     private void initEssentials(String name){
-        addToActiveThreads();
         configureName(name);
-        if (autoStart) start();
+        addToProcesses();
+        if (autoStart) {
+            start();
+        }
+    }
+
+    private void addToProcesses(){
+        manager.getAll().add(this);
+    }
+
+    private void addToActiveProcesses(){
+        manager.getActive().add(this);
     }
 
     /**
@@ -105,11 +116,6 @@ public class BetterThread extends Thread implements DisplayableThread {
         }
     }
 
-    private void addToActiveThreads(){
-        manager.getAll().add(this);
-        manager.getActive().add(this);
-    }
-
     /**
      * Do NOT use this method to run a thread.
      * A thread is already started automatically when you create one!
@@ -123,7 +129,8 @@ public class BetterThread extends Thread implements DisplayableThread {
             runAtStart();
         } catch (Exception e) {
             setSuccess(false);
-            getWarnings().add(new Warning(this, e));
+            if (e.getMessage()!=null) setStatus(e.getMessage());
+            getWarnings().add(new BetterWarning(this, e));
         }
     }
 
@@ -135,19 +142,22 @@ public class BetterThread extends Thread implements DisplayableThread {
      */
     public void runAtStart() throws Exception{
         // Override this method when extending this Class in your thread
+        addToActiveProcesses();
     }
 
     /**
-     * Gets the current value(now) and increments it.
-     * Also checks if it finished.
+     * Increments the current (now) value.
+     * Also checks if its finished.
+     * @return the incremented now value.
      */
-    public void step(){
+    public long step(){
         this.now++;
         isFinished();
+        return now;
     }
 
     /**
-     * Get the current values percentage.
+     * Get the current values percentage (now/max).
      * @return
      */
     public byte getPercent(){
@@ -184,7 +194,7 @@ public class BetterThread extends Thread implements DisplayableThread {
     public void skip(){
         skipped=true;
         finish();
-        setStatus("Skipped. Enable in config file.");
+        setStatus("Skipped...");
     }
 
     public void setMin(long min) {
@@ -225,11 +235,8 @@ public class BetterThread extends Thread implements DisplayableThread {
     public boolean isFinished(){
         if (now==max){
             if (autoFinish) finish();
-            return finished=true;
         }
-        else{
-            return finished=false;
-        }
+        return finished;
     }
 
     public boolean isSkipped(){
@@ -244,7 +251,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      */
     public void setSuccess(boolean success){
         this.success = success;
-        finish();
+        if (!finished) finish();
     }
 
     /**
@@ -256,12 +263,29 @@ public class BetterThread extends Thread implements DisplayableThread {
         return success;
     }
 
+    public boolean isAutoStart() {
+        return autoStart;
+    }
+
+    public void setAutoStart(boolean autoStart) {
+        this.autoStart = autoStart;
+    }
+
+    public boolean isAutoFinish() {
+        return autoFinish;
+    }
+
+    public void setAutoFinish(boolean autoFinish) {
+        this.autoFinish = autoFinish;
+    }
+
     @Override
-    public List<Warning> getWarnings() {
-        if (warnings==null){
-            warnings = new ArrayList();
-        }
-        return warnings;
+    public List<BetterWarning> getWarnings() {
+        return betterWarnings;
+    }
+
+    public List<String> getSummary() {
+        return summary;
     }
 
 }
