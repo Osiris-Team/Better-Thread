@@ -8,6 +8,7 @@
 
 package com.osiris.betterthread;
 
+import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 
 import java.time.LocalDateTime;
@@ -99,7 +100,7 @@ public class BetterThreadDisplayer {
     private void restoreAndCleanPos(){
         System.out.print(ansi().restoreCursorPosition());
         for (int i = 0; i < lineCounter; i++) {
-            System.out.println(ansi().eraseLine());
+            System.out.println(ansi().eraseLine(Ansi.Erase.ALL));
         }
         System.out.print(ansi().restoreCursorPosition());
         lineCounter=0;
