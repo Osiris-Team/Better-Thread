@@ -24,7 +24,7 @@ public class BetterThread extends Thread implements DisplayableThread {
     private boolean finished = false;
     private boolean skipped = false;
     private boolean success = true;
-    private boolean autoStart = true;
+    private boolean autoStart = false;
     private boolean autoFinish = true;
     private List<BetterWarning> betterWarnings = new ArrayList<>();
     private List<String> summary = new ArrayList();
@@ -60,7 +60,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      * @param now The current progress of the thread.
      */
     public BetterThread(String name, int min, int max, int now, BetterThreadManager manager){
-        this(name, (long) min, max, now, manager, true, true);
+        this(name, (long) min, max, now, manager, false, true);
     }
 
     /**
@@ -70,7 +70,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      * @param max The maximum. Usually when the thread finishes.
      * @param now The current progress of the thread.
      * @param manager The parent ThreadManager this Thread should be added to.
-     * @param autoStart Starts the thread automatically. No need to call the start() method. Default it true.
+     * @param autoStart Starts the thread automatically. No need to call the start() method. Default it false.
      * @param autoFinish Finishes when the now value equals the max value.
      *                   Its checked every time step()/isFinished() is called.
      *                   Default is true. If you disable this you will have to call the finish() method by yourself.
