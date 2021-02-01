@@ -24,8 +24,8 @@ public class BetterThread extends Thread implements DisplayableThread {
     private boolean skipped = false;
     private boolean success = true;
     private BetterThreadManager manager;
-    private boolean autoStart;
-    private boolean autoFinish;
+    private boolean autoStart = true;
+    private boolean autoFinish = true;
     private List<BetterWarning> betterWarnings = new ArrayList<>();
     private List<String> summary = new ArrayList();
 
@@ -82,6 +82,7 @@ public class BetterThread extends Thread implements DisplayableThread {
         this.now = now;
         this.manager = manager;
         this.autoStart = autoStart;
+        this.autoFinish = autoFinish;
         initEssentials(name);
     }
 
