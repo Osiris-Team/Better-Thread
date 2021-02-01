@@ -16,14 +16,14 @@ import java.util.List;
  * It contains the core functionality.
  */
 public class BetterThread extends Thread implements DisplayableThread {
+    private BetterThreadManager manager;
     private long min;
     private long max;
     private long now;
-    private String currentStatus = "Initialising...";
+    private String status = "Initialising...";
     private boolean finished = false;
     private boolean skipped = false;
     private boolean success = true;
-    private BetterThreadManager manager;
     private boolean autoStart = true;
     private boolean autoFinish = true;
     private List<BetterWarning> betterWarnings = new ArrayList<>();
@@ -209,7 +209,7 @@ public class BetterThread extends Thread implements DisplayableThread {
     }
 
     public void setStatus(String status) {
-        this.currentStatus = status;
+        this.status = status;
     }
 
     @Override
@@ -229,7 +229,7 @@ public class BetterThread extends Thread implements DisplayableThread {
 
     @Override
     public String getStatus(){
-        return currentStatus;
+        return status;
     }
 
     @Override
@@ -285,8 +285,29 @@ public class BetterThread extends Thread implements DisplayableThread {
         return betterWarnings;
     }
 
+    public List<BetterWarning> getBetterWarnings() {
+        return betterWarnings;
+    }
+
+    public void setBetterWarnings(List<BetterWarning> betterWarnings) {
+        this.betterWarnings = betterWarnings;
+    }
+
+    public void setSummary(List<String> summary) {
+        this.summary = summary;
+    }
+
     public List<String> getSummary() {
         return summary;
     }
+
+    public BetterThreadManager getManager() {
+        return manager;
+    }
+
+    public void setManager(BetterThreadManager manager) {
+        this.manager = manager;
+    }
+
 
 }
