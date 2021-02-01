@@ -26,6 +26,7 @@ public class BetterThread extends Thread implements DisplayableThread {
     private boolean success = true;
     private boolean autoStart = false;
     private boolean autoFinish = true;
+    private boolean started = false;
     private List<BetterWarning> betterWarnings = new ArrayList<>();
     private List<String> summary = new ArrayList();
 
@@ -144,6 +145,7 @@ public class BetterThread extends Thread implements DisplayableThread {
     public void runAtStart() throws Exception{
         // Override this method when extending this Class in your thread
         addToActiveProcesses();
+        started = true;
     }
 
     /**
@@ -309,5 +311,11 @@ public class BetterThread extends Thread implements DisplayableThread {
         this.manager = manager;
     }
 
+    public boolean isStarted() {
+        return started;
+    }
 
+    public void setStarted(boolean started) {
+        this.started = started;
+    }
 }
