@@ -42,7 +42,6 @@ public class UsageExample {
         MyFirstTask task5 = new MyFirstTask(manager);
         MyFirstTask task6 = new MyFirstTask(manager);
         MyFirstTask task7 = new MyFirstTask(manager);
-
     }
 
 }

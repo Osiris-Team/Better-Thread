@@ -22,7 +22,7 @@ public class BetterThread extends Thread implements DisplayableThread {
     private String currentStatus = "Initialising...";
     private boolean finished = false;
     private boolean skipped = false;
-    private boolean success = false;
+    private boolean success = true;
     private BetterThreadManager manager;
     private boolean autoStart;
     private boolean autoFinish;
@@ -244,9 +244,8 @@ public class BetterThread extends Thread implements DisplayableThread {
     }
 
     /**
-     * Remember to use this method at the end of your thread.
-     * The default value is false.
-     * When called automatically finishes the thread.
+     * The default value is true.
+     * When called also finishes the thread.
      * @param success
      */
     public void setSuccess(boolean success){
@@ -256,6 +255,7 @@ public class BetterThread extends Thread implements DisplayableThread {
 
     /**
      * Did the thread finish as planned or not?
+     * Default is true.
      * @return false if an error occurred.
      */
     @Override
