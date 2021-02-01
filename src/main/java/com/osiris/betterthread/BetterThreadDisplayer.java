@@ -203,8 +203,19 @@ public class BetterThreadDisplayer {
             // This means we finished and should stop looping
             // We print the last warnings message and stop.
             if (manager.getActive().isEmpty()){
-                formatWarnings();
-                return false;
+                // Check if there are no threads that weren't started yet
+                boolean isPendingStart = false;
+                for (BetterThread t :
+                        manager.getAll()) {
+                    if (!t.isStarted()){
+                        isPendingStart = true;
+                        break;
+                    }
+                }
+                if (!isPendingStart){
+                    formatWarnings();
+                    return false;
+                }
             }
 
         }
