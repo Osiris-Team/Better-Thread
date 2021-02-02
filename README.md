@@ -4,7 +4,7 @@
 Provides ordered, live thread visualisation inside console using [jansi](http://fusesource.github.io/jansi/).
 
 ## Features
-Currently only for windows due to Jansi errors on other platforms.
+Currently only for Windows due to Jansi errors on other platforms.
 
 ## Installation
 
