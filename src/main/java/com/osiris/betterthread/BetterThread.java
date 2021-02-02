@@ -164,7 +164,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      * @return
      */
     public byte getPercent(){
-        return (byte) ((now/max)*100);
+        return (byte) (now*100/max);
     }
 
     /**
