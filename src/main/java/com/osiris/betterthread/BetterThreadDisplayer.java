@@ -8,6 +8,7 @@
 
 package com.osiris.betterthread;
 
+
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 
@@ -25,7 +26,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * all active BetterThreads.
  * Runs until there are no more active BetterThreads.
  */
-public class BetterThreadDisplayer {
+public class BetterThreadDisplayer extends Thread {
     private BetterThreadManager manager;
     private String label = "[MyAppName]";
     private String threadType = "[PROCESS]";
@@ -35,7 +36,6 @@ public class BetterThreadDisplayer {
     private boolean showDetailedWarnings;
     private int refreshInterval;
 
-    private int lineCounter = 0;
     private static byte anim;
 
     /**
@@ -73,19 +73,20 @@ public class BetterThreadDisplayer {
 
         // Check if Jansi console was already started
         AnsiConsole.systemInstall();
+        this.start();
+    }
 
-        savePos();
-
-        Thread thread = new Thread(()->{
-            try{
-                while (printAll()){
-                    Thread.sleep(refreshInterval);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+    @Override
+    public void run() {
+        super.run();
+        try{
+            savePos();
+            while (printAll()){
+                sleep(refreshInterval);
             }
-        });
-        thread.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -94,16 +95,13 @@ public class BetterThreadDisplayer {
      */
     public void savePos(){
         // Save cursor position so we can go back and update the lines.
-        System.out.println(ansi().saveCursorPosition());
+        System.out.print(ansi().saveCursorPosition());
     }
 
     private void restoreAndCleanPos(){
         System.out.print(ansi().restoreCursorPosition());
-        for (int i = 0; i < lineCounter; i++) {
-            System.out.println(ansi().eraseLine(Ansi.Erase.ALL));
-        }
+        System.out.print(ansi().eraseLine(Ansi.Erase.FORWARD));
         System.out.print(ansi().restoreCursorPosition());
-        lineCounter=0;
     }
 
     /**
@@ -120,8 +118,7 @@ public class BetterThreadDisplayer {
         now = LocalDateTime.now();
 
         if (manager.getAll().size()==0){
-            System.out.println("No threads! Waiting...");
-            lineCounter++;
+            System.out.println(ansi().a("No threads! Waiting..."));
         }
         else{
             for (int i = 0; i < manager.getAll().size(); i++) {
@@ -159,44 +156,41 @@ public class BetterThreadDisplayer {
                 else{
                     switch (anim) {
                         case 1:
-                            System.out.print(" [\\] ");
+                            System.out.print(ansi().a(" [\\] "));
                             break;
                         case 2:
-                            System.out.print(" [|] ");
+                            System.out.print(ansi().a(" [|] "));
                             break;
                         case 3:
-                            System.out.print(" [/] ");
+                            System.out.print(ansi().a(" [/] "));
                             break;
                         default:
                             anim = 0;
-                            System.out.print(" [-] " );
+                            System.out.print(ansi().a(" [-] "));
                     }
                 }
 
 
                 // Add the actual process details and finish the line
-                final String name =process.getName();
+                final String name = process.getName();
                 final long now = process.getNow();
                 final long max = process.getMax();
+                final byte percent = process.getPercent();
                 final String status= process.getStatus();
 
                 if (now>0){
                     if (process.isSkipped())
                         System.out.print(ansi()
-                            .a("> ["+name+"] "+status)
-                            .reset()+"\n");
+                            .a("> ["+name+"] "+status));
                     else
                         System.out.print(ansi()
-                            .a("> ["+name+"]["+getPercentage(now,max)+"%] "+status)
-                            .reset()+"\n");
+                            .a("> ["+name+"]["+percent+"%] "+status));
                 }
                 else{
                     System.out.print(ansi()
-                            .a("> ["+name+"] "+status)
-                            .reset()+"\n");
+                            .a("> ["+name+"] "+status));
                 }
-
-                lineCounter++;
+                System.out.println(ansi().reset());
             }
             // This must be done outside the for loop otherwise the animation wont work
             anim++;
@@ -220,7 +214,6 @@ public class BetterThreadDisplayer {
             }
 
         }
-
         return true;
     }
 
@@ -232,14 +225,6 @@ public class BetterThreadDisplayer {
      * This is will be shown when all processes finished.
      */
     private void formatWarnings(){
-
-        System.out.print(ansi()
-                .bg(WHITE)
-                .fg(BLACK).a("["+dateFormatter.format(now)+"]")
-                .fg(CYAN).a(label)
-                .fg(BLACK).a("[SUMMARY]")
-                .reset());
-
         List<BetterWarning> allBetterWarnings = new ArrayList();
 
         // Go through every process and add their warnings to the allBetterWarnings list
@@ -251,21 +236,31 @@ public class BetterThreadDisplayer {
             }
         }
 
+
+        Ansi ansiDate = ansi()
+                .bg(WHITE)
+                .fg(BLACK).a("["+dateFormatter.format(now)+"]")
+                .fg(CYAN).a(label)
+                .fg(BLACK).a("[SUMMARY]")
+                .reset();
+
         if (allBetterWarnings.isEmpty()){
             System.out.print(ansi()
                     .fg(GREEN).a(" Executed all tasks successfully!")
-                    .reset()+"\n");
+                    .reset());
         }
         else if (showWarnings) {
             System.out.print(ansi()
                     .fg(YELLOW).a(" There are " + allBetterWarnings.size() + " warnings:")
-                    .reset() + "\n");
+                    .reset());
 
             if (showDetailedWarnings) {
                 BetterWarning betterWarning;
                 for (int i = 0; i < allBetterWarnings.size(); i++) {
                     betterWarning = allBetterWarnings.get(i);
-                    System.out.println(ansi()
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(ansiDate);
+                    builder.append(ansi()
                             .bg(WHITE)
                             .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
                             .fg(CYAN).a(label)
@@ -273,24 +268,28 @@ public class BetterThreadDisplayer {
                                     "][Cause: " + betterWarning.getException().getCause() +
                                     "][Extra: " + betterWarning.getExtraInfo() +
                                     "][Trace: " + Arrays.toString(betterWarning.getException().getStackTrace())).reset());
+                    System.out.print(builder.toString());
                 }
             }
             else {
                 BetterWarning betterWarning;
                 for (int i = 0; i < allBetterWarnings.size(); i++) {
                     betterWarning = allBetterWarnings.get(i);
-                    System.out.println(ansi()
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(ansiDate);
+                    builder.append(ansi()
                             .bg(WHITE)
                             .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
                             .fg(CYAN).a(label)
                             .reset().fg(YELLOW).a("[WARNING-" + i + "][" + betterWarning.getThread().getName() + "][Message: " + betterWarning.getException().getMessage() + "]").reset());
+                    System.out.print(builder.toString());
                 }
             }
         }
         else{
             System.out.print(ansi()
                     .fg(YELLOW).a(" There are "+ allBetterWarnings.size()+" warnings! Enable 'show-warnings' in the to view them, or check your debug log for further details!")
-                    .reset()+"\n");
+                    .reset());
         }
     }
 
