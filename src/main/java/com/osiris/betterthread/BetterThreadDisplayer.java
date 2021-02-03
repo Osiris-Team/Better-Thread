@@ -48,7 +48,6 @@ public class BetterThreadDisplayer extends Thread {
      */
     public BetterThreadDisplayer(BetterThreadManager manager) {
         this(manager, null, null, null, true, false, 250);
-        this.manager = manager;
     }
 
     /**
@@ -179,7 +178,7 @@ public class BetterThreadDisplayer extends Thread {
                 final byte percent = process.getPercent();
                 final String status= process.getStatus();
 
-                if (now>0){
+                if (now >0){
                     if (process.isSkipped())
                         System.out.print(ansi()
                             .a("> ["+name+"] "+status));
@@ -200,25 +199,8 @@ public class BetterThreadDisplayer extends Thread {
             // We print the last warnings message and stop.
             if (manager.getActive().isEmpty()){
                 // Check if there are no threads that weren't started yet
-                boolean isPendingStart = false;
-                for (BetterThread t :
-                        manager.getAll()) {
-                    if (!t.isStarted()){
-                        isPendingStart = true;
-                        break;
-                    }
-                }
-                if (!isPendingStart){
-
-                    // Go through every process and add their warnings to the allBetterWarnings list
-                    for (BetterThread process :
-                            manager.getAll()) {
-                        List<BetterWarning> betterWarnings = process.getWarnings();
-                        if (!betterWarnings.isEmpty()){
-                            allWarnings.addAll(betterWarnings);
-                        }
-                    }
-
+                if (!manager.threadsPendingStart()){
+                    this.allWarnings = manager.getAllWarnings();
                     formatWarnings();
                     finished = true;
                     return false;

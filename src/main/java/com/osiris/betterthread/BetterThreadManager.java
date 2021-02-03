@@ -9,14 +9,15 @@
 package com.osiris.betterthread;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Contains information about active
  * and inactive threads.
  */
 public class BetterThreadManager {
-    private List<BetterThread> all = new ArrayList<>();
-    private List<BetterThread> active = new ArrayList<>();
+    private List<BetterThread> all = new CopyOnWriteArrayList<>();
+    private List<BetterThread> active = new CopyOnWriteArrayList<>();
 
     /**
      * A list containing all current and finished threads.
@@ -48,6 +49,35 @@ public class BetterThreadManager {
     public void clear(){
         all.clear();
         active.clear();
+    }
+
+    /**
+     * Returns true when there is a not started Thread in the list.
+     */
+    public boolean threadsPendingStart(){
+        for (BetterThread t :
+                all) {
+            if (!t.isStarted()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns all warnings from all threads, that were
+     * added to this manager.
+     */
+    public List<BetterWarning> getAllWarnings(){
+        List<BetterWarning> list = new ArrayList<>();
+        for (BetterThread process :
+                all) {
+            List<BetterWarning> betterWarnings = process.getWarnings();
+            if (!betterWarnings.isEmpty()){
+                list.addAll(betterWarnings);
+            }
+        }
+        return list;
     }
 
 }

@@ -10,6 +10,7 @@ package com.osiris.betterthread;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This class was build to be extended.
@@ -38,15 +39,32 @@ public class BetterThread extends Thread implements DisplayableThread {
      * @param manager the BetterThreadManager.
      */
     public BetterThread(BetterThreadManager manager) {
-        this(null, 0, 100, 0, manager);
+        this(null, 0, 100,0, manager);
     }
+
+    /**
+     * Convenience method for directly starting the thread.
+     * Auto-start is disabled by default.
+     * {@link #BetterThread(BetterThreadManager)}
+     */
+    public BetterThread(BetterThreadManager manager, boolean autoStart){
+        this(null, 0, 100,0, manager, autoStart, false);
+    }
+
+    /**
+     * {@link #BetterThread(BetterThreadManager)}
+     */
+    public BetterThread(BetterThreadManager manager, boolean autoStart, boolean autoFinish){
+        this(null, 0, 100,0, manager, autoStart, autoFinish);
+    }
+
 
     /**
      * Creates a new thread and runs it.
      * The default values 0(min), 100(max) and 0(now) are used.
      * You can change them by using the set methods or a different constructor.
      * You need to pass over the threadManagers instance.
-     * @param name set this threades name.
+     * @param name set this threads name.
      * @param manager the BetterThreadManager.
      */
     public BetterThread(String name, BetterThreadManager manager) {
@@ -60,7 +78,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      * @param max The maximum. Usually when the thread finishes.
      * @param now The current progress of the thread.
      */
-    public BetterThread(String name, int min, int max, int now, BetterThreadManager manager){
+    public BetterThread(String name, int min, long max, long now, BetterThreadManager manager){
         this(name, (long) min, max, now, manager, false, true);
     }
 
@@ -90,9 +108,7 @@ public class BetterThread extends Thread implements DisplayableThread {
     private void initEssentials(String name){
         configureName(name);
         addToProcesses();
-        if (autoStart) {
-            start();
-        }
+        if (autoStart) start();
     }
 
     private void addToProcesses(){
@@ -164,7 +180,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      * @return
      */
     public byte getPercent(){
-        return (byte) (now*100/max);
+        return (byte) (now *100/ max);
     }
 
     /**
@@ -236,7 +252,7 @@ public class BetterThread extends Thread implements DisplayableThread {
 
     @Override
     public boolean isFinished(){
-        if (now==max){
+        if (now ==max){
             if (autoFinish) finish();
         }
         return finished;
@@ -318,4 +334,5 @@ public class BetterThread extends Thread implements DisplayableThread {
     public void setStarted(boolean started) {
         this.started = started;
     }
+
 }

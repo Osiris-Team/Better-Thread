@@ -16,8 +16,10 @@ public class UsageExample {
         // Note: This is only for explanation purposes. In production create this class inside a package.
         class MyFirstTask extends BetterThread{
 
-            public MyFirstTask(BetterThreadManager manager) {
-                super(manager);
+
+
+            public MyFirstTask(BetterThreadManager manager, boolean autoStart) {
+                super(manager, autoStart);
             }
 
             @Override
@@ -35,13 +37,13 @@ public class UsageExample {
         }
 
         // 4. Run the tasks
-        MyFirstTask task1 = new MyFirstTask(manager);
-        MyFirstTask task2 = new MyFirstTask(manager);
-        MyFirstTask task3 = new MyFirstTask(manager);
-        MyFirstTask task4 = new MyFirstTask(manager);
-        MyFirstTask task5 = new MyFirstTask(manager);
-        MyFirstTask task6 = new MyFirstTask(manager);
-        MyFirstTask task7 = new MyFirstTask(manager);
+        MyFirstTask task1 = new MyFirstTask(manager, true);
+        MyFirstTask task2 = new MyFirstTask(manager, true);
+        MyFirstTask task3 = new MyFirstTask(manager, true);
+        MyFirstTask task4 = new MyFirstTask(manager, true);
+        MyFirstTask task5 = new MyFirstTask(manager, true);
+        MyFirstTask task6 = new MyFirstTask(manager, true);
+        MyFirstTask task7 = new MyFirstTask(manager, true);
     }
 
 }
