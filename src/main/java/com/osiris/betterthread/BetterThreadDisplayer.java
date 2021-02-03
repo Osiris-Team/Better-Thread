@@ -30,11 +30,13 @@ public class BetterThreadDisplayer extends Thread {
     private BetterThreadManager manager;
     private String label = "[MyAppName]";
     private String threadType = "[PROCESS]";
-    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     private LocalDateTime now;
     private boolean showWarnings;
     private boolean showDetailedWarnings;
     private int refreshInterval;
+    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private List<BetterWarning> allWarnings = new ArrayList<>();
+    private boolean finished;
 
     private static byte anim;
 
@@ -73,7 +75,6 @@ public class BetterThreadDisplayer extends Thread {
 
         // Check if Jansi console was already started
         AnsiConsole.systemInstall();
-        this.start();
     }
 
     @Override
@@ -208,7 +209,18 @@ public class BetterThreadDisplayer extends Thread {
                     }
                 }
                 if (!isPendingStart){
+
+                    // Go through every process and add their warnings to the allBetterWarnings list
+                    for (BetterThread process :
+                            manager.getAll()) {
+                        List<BetterWarning> betterWarnings = process.getWarnings();
+                        if (!betterWarnings.isEmpty()){
+                            allWarnings.addAll(betterWarnings);
+                        }
+                    }
+
                     formatWarnings();
+                    finished = true;
                     return false;
                 }
             }
@@ -225,17 +237,6 @@ public class BetterThreadDisplayer extends Thread {
      * This is will be shown when all processes finished.
      */
     private void formatWarnings(){
-        List<BetterWarning> allBetterWarnings = new ArrayList();
-
-        // Go through every process and add their warnings to the allBetterWarnings list
-        for (BetterThread process :
-                manager.getAll()) {
-            List<BetterWarning> betterWarnings = process.getWarnings();
-            if (!betterWarnings.isEmpty()){
-                allBetterWarnings.addAll(betterWarnings);
-            }
-        }
-
 
         Ansi ansiDate = ansi()
                 .bg(WHITE)
@@ -244,20 +245,20 @@ public class BetterThreadDisplayer extends Thread {
                 .fg(BLACK).a("[SUMMARY]")
                 .reset();
 
-        if (allBetterWarnings.isEmpty()){
+        if (allWarnings.isEmpty()){
             System.out.print(ansi()
                     .fg(GREEN).a(" Executed all tasks successfully!")
                     .reset());
         }
         else if (showWarnings) {
             System.out.print(ansi()
-                    .fg(YELLOW).a(" There are " + allBetterWarnings.size() + " warnings:")
+                    .fg(YELLOW).a(" There are " + allWarnings.size() + " warnings:")
                     .reset());
 
             if (showDetailedWarnings) {
                 BetterWarning betterWarning;
-                for (int i = 0; i < allBetterWarnings.size(); i++) {
-                    betterWarning = allBetterWarnings.get(i);
+                for (int i = 0; i < allWarnings.size(); i++) {
+                    betterWarning = allWarnings.get(i);
                     StringBuilder builder = new StringBuilder();
                     builder.append(ansiDate);
                     builder.append(ansi()
@@ -273,8 +274,8 @@ public class BetterThreadDisplayer extends Thread {
             }
             else {
                 BetterWarning betterWarning;
-                for (int i = 0; i < allBetterWarnings.size(); i++) {
-                    betterWarning = allBetterWarnings.get(i);
+                for (int i = 0; i < allWarnings.size(); i++) {
+                    betterWarning = allWarnings.get(i);
                     StringBuilder builder = new StringBuilder();
                     builder.append(ansiDate);
                     builder.append(ansi()
@@ -288,9 +289,80 @@ public class BetterThreadDisplayer extends Thread {
         }
         else{
             System.out.print(ansi()
-                    .fg(YELLOW).a(" There are "+ allBetterWarnings.size()+" warnings! Enable 'show-warnings' in the to view them, or check your debug log for further details!")
+                    .fg(YELLOW).a(" There are "+ allWarnings.size()+" warnings! Enable 'show-warnings' in the to view them, or check your debug log for further details!")
                     .reset());
         }
     }
 
+    public BetterThreadManager getManager() {
+        return manager;
+    }
+
+    public void setManager(BetterThreadManager manager) {
+        this.manager = manager;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getThreadType() {
+        return threadType;
+    }
+
+    public void setThreadType(String threadType) {
+        this.threadType = threadType;
+    }
+
+    public boolean isShowWarnings() {
+        return showWarnings;
+    }
+
+    public void setShowWarnings(boolean showWarnings) {
+        this.showWarnings = showWarnings;
+    }
+
+    public boolean isShowDetailedWarnings() {
+        return showDetailedWarnings;
+    }
+
+    public void setShowDetailedWarnings(boolean showDetailedWarnings) {
+        this.showDetailedWarnings = showDetailedWarnings;
+    }
+
+    public int getRefreshInterval() {
+        return refreshInterval;
+    }
+
+    public void setRefreshInterval(int refreshInterval) {
+        this.refreshInterval = refreshInterval;
+    }
+
+    public DateTimeFormatter getDateFormatter() {
+        return dateFormatter;
+    }
+
+    public void setDateFormatter(DateTimeFormatter dateFormatter) {
+        this.dateFormatter = dateFormatter;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+    }
+
+    public List<BetterWarning> getAllWarnings() {
+        return allWarnings;
+    }
+
+    public void setAllWarnings(List<BetterWarning> allWarnings) {
+        this.allWarnings = allWarnings;
+    }
 }
