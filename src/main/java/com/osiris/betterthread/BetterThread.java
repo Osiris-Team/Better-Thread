@@ -180,7 +180,8 @@ public class BetterThread extends Thread implements DisplayableThread {
      * @return
      */
     public byte getPercent(){
-        return (byte) (now *100/ max);
+        if (now==0) return 0; // Protection against division by 0
+        else return (byte) (now *100/ max);
     }
 
     /**
