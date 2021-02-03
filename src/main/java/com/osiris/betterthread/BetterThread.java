@@ -181,7 +181,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      */
     public byte getPercent(){
         if (now==0) return 0; // Protection against division by 0
-        else return (byte) (now *100/ max);
+        else return (byte) (now*100/max);
     }
 
     /**
@@ -206,6 +206,24 @@ public class BetterThread extends Thread implements DisplayableThread {
     public void finish(boolean success){
         finish();
         setSuccess(success);
+    }
+
+    /**
+     * Finishes the thread and sets its status message.
+     */
+    public void finish(String status){
+        finish();
+        setStatus(status);
+    }
+
+    /**
+     * Finishes the thread.
+     * Sets status message and success.
+     */
+    public void finish(String status, boolean success){
+        finish();
+        setSuccess(success);
+        setStatus(status);
     }
 
     /**
