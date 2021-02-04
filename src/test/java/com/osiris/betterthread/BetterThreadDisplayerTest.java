@@ -21,7 +21,7 @@ class BetterThreadDisplayerTest {
         // Its normal to get values over 100% because of this loop
         Thread thread = new Thread(()->{
             try {
-                while (!displayer.isFinished())
+                while (!manager.isFinished())
                     for (BetterThread t :
                             manager.getAll()) {
                         t.step();
@@ -34,7 +34,7 @@ class BetterThreadDisplayerTest {
         thread.start();
 
         try{
-            while (!displayer.isFinished())
+            while (!manager.isFinished())
                 Thread.sleep(1000);
             boolean isWarning = false;
             for (BetterThread t :
