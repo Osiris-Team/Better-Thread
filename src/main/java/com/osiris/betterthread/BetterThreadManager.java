@@ -18,6 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class BetterThreadManager {
     private List<BetterThread> all = new CopyOnWriteArrayList<>();
     private List<BetterThread> active = new CopyOnWriteArrayList<>();
+    private boolean finished;
 
     /**
      * A list containing all current and finished threads.
@@ -80,4 +81,18 @@ public class BetterThreadManager {
         return list;
     }
 
+    public boolean isFinished() {
+        // This means that all tasks have finished
+        if (active.isEmpty()){
+            // Check if there are no threads that weren't started yet
+            if (!threadsPendingStart()){
+                return finished = true;
+            }
+        }
+        return finished = false;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+    }
 }

@@ -36,7 +36,6 @@ public class BetterThreadDisplayer extends Thread {
     private int refreshInterval;
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     private List<BetterWarning> allWarnings = new ArrayList<>();
-    private boolean finished;
 
     private static byte anim;
 
@@ -197,14 +196,10 @@ public class BetterThreadDisplayer extends Thread {
 
             // This means we finished and should stop looping
             // We print the last warnings message and stop.
-            if (manager.getActive().isEmpty()){
-                // Check if there are no threads that weren't started yet
-                if (!manager.threadsPendingStart()){
-                    this.allWarnings = manager.getAllWarnings();
-                    formatWarnings();
-                    finished = true;
-                    return false;
-                }
+            if (manager.isFinished()){
+                this.allWarnings = manager.getAllWarnings();
+                formatWarnings();
+                return false;
             }
 
         }
@@ -330,14 +325,6 @@ public class BetterThreadDisplayer extends Thread {
 
     public void setDateFormatter(DateTimeFormatter dateFormatter) {
         this.dateFormatter = dateFormatter;
-    }
-
-    public boolean isFinished() {
-        return finished;
-    }
-
-    public void setFinished(boolean finished) {
-        this.finished = finished;
     }
 
     public List<BetterWarning> getAllWarnings() {
