@@ -198,7 +198,7 @@ public class BetterThreadDisplayer extends Thread {
             // We print the last warnings message and stop.
             if (manager.isFinished()){
                 this.allWarnings = manager.getAllWarnings();
-                formatWarnings();
+                if(showWarnings) formatWarnings();
                 return false;
             }
 
@@ -223,13 +223,17 @@ public class BetterThreadDisplayer extends Thread {
                 .reset();
 
         if (allWarnings.isEmpty()){
-            System.out.print(ansi()
-                    .fg(GREEN).a(" Executed all tasks successfully!")
+            System.out.println(ansi()
+                    .fg(GREEN)
+                    .a(ansiDate)
+                    .a(" Executed all tasks successfully!")
                     .reset());
         }
         else if (showWarnings) {
-            System.out.print(ansi()
-                    .fg(YELLOW).a(" There are " + allWarnings.size() + " warnings:")
+            System.out.println(ansi()
+                    .fg(YELLOW)
+                    .a(ansiDate)
+                    .a(" There are " + allWarnings.size() + " warnings:")
                     .reset());
 
             if (showDetailedWarnings) {
@@ -246,7 +250,7 @@ public class BetterThreadDisplayer extends Thread {
                                     "][Cause: " + betterWarning.getException().getCause() +
                                     "][Extra: " + betterWarning.getExtraInfo() +
                                     "][Trace: " + Arrays.toString(betterWarning.getException().getStackTrace())).reset());
-                    System.out.print(builder.toString());
+                    System.out.println(builder.toString());
                 }
             }
             else {
@@ -260,12 +264,12 @@ public class BetterThreadDisplayer extends Thread {
                             .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
                             .fg(CYAN).a(label)
                             .reset().fg(YELLOW).a("[WARNING-" + i + "][" + betterWarning.getThread().getName() + "][Message: " + betterWarning.getException().getMessage() + "]").reset());
-                    System.out.print(builder.toString());
+                    System.out.println(builder.toString());
                 }
             }
         }
         else{
-            System.out.print(ansi()
+            System.out.println(ansi()
                     .fg(YELLOW).a(" There are "+ allWarnings.size()+" warnings! Enable 'show-warnings' in the to view them, or check your debug log for further details!")
                     .reset());
         }
