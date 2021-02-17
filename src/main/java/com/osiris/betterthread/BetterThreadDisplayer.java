@@ -46,7 +46,30 @@ public class BetterThreadDisplayer extends Thread {
      * @param manager
      */
     public BetterThreadDisplayer(BetterThreadManager manager) {
-        this(manager, null, null, null, true, false, 250);
+        this(manager, null);
+    }
+
+    public BetterThreadDisplayer(BetterThreadManager manager, String label) {
+        this(manager, label, null);
+    }
+
+    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadType) {
+        this(manager, label, threadType, null);
+    }
+
+    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadType,
+                                 DateTimeFormatter formatter) {
+        this(manager, label, threadType, formatter, false);
+    }
+
+    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadType,
+                                 DateTimeFormatter formatter, boolean showWarnings) {
+        this(manager, label, threadType, formatter, showWarnings, false);
+    }
+
+    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadType,
+                                 DateTimeFormatter formatter, boolean showWarnings, boolean showDetailedWarnings) {
+        this(manager, label, threadType, formatter, showWarnings, showDetailedWarnings, 250);
     }
 
     /**
@@ -99,7 +122,7 @@ public class BetterThreadDisplayer extends Thread {
 
     private void restoreAndCleanPos(){
         System.out.print(ansi().restoreCursorPosition());
-        System.out.print(ansi().eraseLine(Ansi.Erase.FORWARD));
+        System.out.print(ansi().eraseScreen(Ansi.Erase.FORWARD)); // Better than eraseLine
         System.out.print(ansi().restoreCursorPosition());
     }
 
@@ -198,7 +221,7 @@ public class BetterThreadDisplayer extends Thread {
             // We print the last warnings message and stop.
             if (manager.isFinished()){
                 this.allWarnings = manager.getAllWarnings();
-                if(showWarnings) formatWarnings();
+                formatWarnings();
                 return false;
             }
 
@@ -224,15 +247,15 @@ public class BetterThreadDisplayer extends Thread {
 
         if (allWarnings.isEmpty()){
             System.out.println(ansi()
-                    .fg(GREEN)
                     .a(ansiDate)
+                    .fg(GREEN)
                     .a(" Executed all tasks successfully!")
                     .reset());
         }
         else if (showWarnings) {
             System.out.println(ansi()
-                    .fg(YELLOW)
                     .a(ansiDate)
+                    .fg(YELLOW)
                     .a(" There are " + allWarnings.size() + " warnings:")
                     .reset());
 
@@ -243,10 +266,7 @@ public class BetterThreadDisplayer extends Thread {
                     StringBuilder builder = new StringBuilder();
                     builder.append(ansiDate);
                     builder.append(ansi()
-                            .bg(WHITE)
-                            .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
-                            .fg(CYAN).a(label)
-                            .reset().fg(YELLOW).a("[WARNING-" + i + "][" + betterWarning.getThread().getName() + "][Message: " + betterWarning.getException().getMessage() +
+                            .fg(YELLOW).a("[WARNING-" + i + "][" + betterWarning.getThread().getName() + "][Message: " + betterWarning.getException().getMessage() +
                                     "][Cause: " + betterWarning.getException().getCause() +
                                     "][Extra: " + betterWarning.getExtraInfo() +
                                     "][Trace: " + Arrays.toString(betterWarning.getException().getStackTrace())).reset());
@@ -260,17 +280,14 @@ public class BetterThreadDisplayer extends Thread {
                     StringBuilder builder = new StringBuilder();
                     builder.append(ansiDate);
                     builder.append(ansi()
-                            .bg(WHITE)
-                            .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
-                            .fg(CYAN).a(label)
-                            .reset().fg(YELLOW).a("[WARNING-" + i + "][" + betterWarning.getThread().getName() + "][Message: " + betterWarning.getException().getMessage() + "]").reset());
+                            .fg(YELLOW).a("[WARNING-" + i + "][" + betterWarning.getThread().getName() + "][Message: " + betterWarning.getException().getMessage() + "]").reset());
                     System.out.println(builder.toString());
                 }
             }
         }
         else{
             System.out.println(ansi()
-                    .fg(YELLOW).a(" There are "+ allWarnings.size()+" warnings! Enable 'show-warnings' in the to view them, or check your debug log for further details!")
+                    .fg(YELLOW).a(" There are "+ allWarnings.size()+" warnings! Enable 'show-warnings' to view them, or check your log for further details!")
                     .reset());
         }
     }
