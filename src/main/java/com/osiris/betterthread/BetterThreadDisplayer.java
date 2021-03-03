@@ -10,10 +10,10 @@ package com.osiris.betterthread;
 
 
 import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
 import org.jline.terminal.Size;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.utils.AttributedString;
 import org.jline.utils.Display;
 
 import java.time.LocalDateTime;
@@ -43,7 +43,7 @@ public class BetterThreadDisplayer extends Thread {
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     private List<BetterWarning> allWarnings = new ArrayList<>();
 
-    private static byte anim;
+    private byte anim;
 
     /**
      * Creates a new ThreadDisplayer with default
@@ -141,93 +141,97 @@ public class BetterThreadDisplayer extends Thread {
         // Get current date
         now = LocalDateTime.now();
 
+        // Fill this list with threads details and update the console after this
+        List<AttributedString> list = new ArrayList<>();
+        manager.getAll().forEach(thread -> {
+            StringBuilder builder = new StringBuilder();
+
+            //Format the output for a single process
+            //First add the date, label and process info labels
+            builder.append(ansi()
+                    .bg(WHITE)
+                    .fg(BLACK).a("["+dateFormatter.format(now)+"]")
+                    .fg(CYAN).a(label)
+                    .fg(BLACK).a(threadType)
+                    .reset());
+
+            //Add the loading animation
+            if (thread.isFinished()){
+                if(thread.isSkipped()){
+                    builder.append(ansi()
+                            .fg(BLUE).a(" [#] ")
+                            .reset());
+                }
+                else if (thread.isSuccess()){
+                    builder.append(ansi()
+                            .fg(GREEN).a(" [#] ")
+                            .reset());
+                }
+                else{
+                    builder.append(ansi()
+                            .fg(RED).a(" [#] ")
+                            .reset());
+                }
+            }
+            else{
+                switch (anim) {
+                    case 1:
+                        builder.append(ansi().a(" [\\] "));
+                        break;
+                    case 2:
+                        builder.append(ansi().a(" [|] "));
+                        break;
+                    case 3:
+                        builder.append(ansi().a(" [/] "));
+                        break;
+                    default:
+                        anim = 0;
+                        builder.append(ansi().a(" [-] "));
+                }
+            }
+
+            // Add the actual process details and finish the line
+            final String name = thread.getName();
+            final long now = thread.getNow();
+            final long max = thread.getMax();
+            final byte percent = thread.getPercent();
+            final String status= thread.getStatus();
+
+            if (now > 0){
+                if (thread.isSkipped())
+                    builder.append(ansi()
+                            .a("> ["+name+"] "+status));
+                else
+                    builder.append(ansi()
+                            .a("> ["+name+"]["+percent+"%] "+status));
+            }
+            else{
+                builder.append(ansi()
+                        .a("> ["+name+"] "+status));
+            }
+            builder.append(ansi().reset());
+
+            // Add this message to the list
+            list.add(new AttributedString(builder.toString()));
+        });
+        // This must be done outside the for loop otherwise the animation wont work
+        anim++;
+
         if (manager.getAll().size()==0){
-            System.out.println(ansi().a("No threads! Waiting..."));
+            list.add(new AttributedString("No threads! Waiting..."));
         }
         else{
-            for (int i = 0; i < manager.getAll().size(); i++) {
-
-                //Get one single process
-                BetterThread process = manager.getAll().get(i);
-
-                //Format the output for a single process
-                //First add the date, label and process info labels
-                System.out.print(ansi()
-                        .bg(WHITE)
-                        .fg(BLACK).a("["+dateFormatter.format(now)+"]")
-                        .fg(CYAN).a(label)
-                        .fg(BLACK).a(threadType)
-                        .reset());
-
-                //Add the loading animation
-                if (process.isFinished()){
-                    if (process.isSuccess()){
-                        System.out.print(ansi()
-                                .fg(GREEN).a(" [#] ")
-                                .reset());
-                    }
-                    else if(process.isSkipped()){
-                        System.out.print(ansi()
-                                .fg(BLUE).a(" [#] ")
-                                .reset());
-                    }
-                    else{
-                        System.out.print(ansi()
-                                .fg(RED).a(" [#] ")
-                                .reset());
-                    }
-                }
-                else{
-                    switch (anim) {
-                        case 1:
-                            System.out.print(ansi().a(" [\\] "));
-                            break;
-                        case 2:
-                            System.out.print(ansi().a(" [|] "));
-                            break;
-                        case 3:
-                            System.out.print(ansi().a(" [/] "));
-                            break;
-                        default:
-                            anim = 0;
-                            System.out.print(ansi().a(" [-] "));
-                    }
-                }
-
-
-                // Add the actual process details and finish the line
-                final String name = process.getName();
-                final long now = process.getNow();
-                final long max = process.getMax();
-                final byte percent = process.getPercent();
-                final String status= process.getStatus();
-
-                if (now >0){
-                    if (process.isSkipped())
-                        System.out.print(ansi()
-                            .a("> ["+name+"] "+status));
-                    else
-                        System.out.print(ansi()
-                            .a("> ["+name+"]["+percent+"%] "+status));
-                }
-                else{
-                    System.out.print(ansi()
-                            .a("> ["+name+"] "+status));
-                }
-                System.out.println(ansi().reset());
-            }
-            // This must be done outside the for loop otherwise the animation wont work
-            anim++;
-
             // This means we finished and should stop looping
             // We print the last warnings message and stop.
             if (manager.isFinished()){
+                display.update(list, -1); // Update one last time
                 this.allWarnings = manager.getAllWarnings();
                 formatWarnings();
                 return false;
             }
-
         }
+
+        display.update(list, -1);
         return true;
     }
 

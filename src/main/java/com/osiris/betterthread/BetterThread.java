@@ -10,7 +10,6 @@ package com.osiris.betterthread;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This class was build to be extended.
