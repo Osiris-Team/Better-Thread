@@ -11,6 +11,10 @@ package com.osiris.betterthread;
 
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
+import org.jline.terminal.Size;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+import org.jline.utils.Display;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,6 +31,8 @@ import static org.fusesource.jansi.Ansi.ansi;
  * Runs until there are no more active BetterThreads.
  */
 public class BetterThreadDisplayer extends Thread {
+    private Terminal terminal;
+    private Display display;
     private BetterThreadManager manager;
     private String label = "[MyAppName]";
     private String threadType = "[PROCESS]";
@@ -83,6 +89,7 @@ public class BetterThreadDisplayer extends Thread {
      * @param showWarnings
      * @param showDetailedWarnings
      * @param refreshInterval
+     * @throws RuntimeException if there was an error getting the systems terminal.
      */
     public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadType, DateTimeFormatter formatter,
                                  boolean showWarnings, boolean showDetailedWarnings, int refreshInterval) {
@@ -95,14 +102,20 @@ public class BetterThreadDisplayer extends Thread {
         this.refreshInterval = refreshInterval;
 
         // Check if Jansi console was already started
-        AnsiConsole.systemInstall();
+        // AnsiConsole.systemInstall();
+        try{
+            terminal = TerminalBuilder.terminal();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("There was an error getting the systems terminal!");
+        }
     }
 
     @Override
     public void run() {
         super.run();
         try{
-            savePos();
+            resize();
             while (printAll()){
                 sleep(refreshInterval);
             }
@@ -111,19 +124,10 @@ public class BetterThreadDisplayer extends Thread {
         }
     }
 
-    /**
-     * Saves the current cursor position.
-     * Call this method once before starting the printall loop, so the cursor jumps back to this position.
-     */
-    public void savePos(){
-        // Save cursor position so we can go back and update the lines.
-        System.out.print(ansi().saveCursorPosition());
-    }
-
-    private void restoreAndCleanPos(){
-        System.out.print(ansi().restoreCursorPosition());
-        System.out.print(ansi().eraseScreen(Ansi.Erase.FORWARD)); // Better than eraseLine
-        System.out.print(ansi().restoreCursorPosition());
+    private void resize(){
+        display = new Display(terminal, false);
+        Size size = terminal.getSize(); // Need to initialize the size on the display with
+        display.resize(size.getRows(), size.getColumns());
     }
 
     /**
@@ -133,8 +137,6 @@ public class BetterThreadDisplayer extends Thread {
      * @return false when all processes have finished!
      */
     public boolean printAll(){
-        // Restore position
-        restoreAndCleanPos();
 
         // Get current date
         now = LocalDateTime.now();
