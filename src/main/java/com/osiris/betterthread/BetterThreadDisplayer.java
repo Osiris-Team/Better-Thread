@@ -10,6 +10,7 @@ package com.osiris.betterthread;
 
 
 import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
 import org.jline.terminal.Size;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
@@ -102,7 +103,7 @@ public class BetterThreadDisplayer extends Thread {
         this.refreshInterval = refreshInterval;
 
         // Check if Jansi console was already started
-        // AnsiConsole.systemInstall();
+        //AnsiConsole.systemInstall();
         try{
             terminal = TerminalBuilder.terminal();
         } catch (Exception e) {
@@ -116,6 +117,7 @@ public class BetterThreadDisplayer extends Thread {
         super.run();
         try{
             resize();
+            terminal.writer().println(" ");
             while (printAll()){
                 sleep(refreshInterval);
             }
@@ -144,10 +146,13 @@ public class BetterThreadDisplayer extends Thread {
         // Fill this list with threads details and update the console after this
         List<AttributedString> list = new ArrayList<>();
         manager.getAll().forEach(thread -> {
+            // Display the information for each thread.
+            // Each thread gets one line.
             StringBuilder builder = new StringBuilder();
 
             //Format the output for a single process
             //First add the date, label and process info labels
+
             builder.append(ansi()
                     .bg(WHITE)
                     .fg(BLACK).a("["+dateFormatter.format(now)+"]")
@@ -156,6 +161,7 @@ public class BetterThreadDisplayer extends Thread {
                     .reset());
 
             //Add the loading animation
+
             if (thread.isFinished()){
                 if(thread.isSkipped()){
                     builder.append(ansi()
@@ -176,13 +182,13 @@ public class BetterThreadDisplayer extends Thread {
             else{
                 switch (anim) {
                     case 1:
-                        builder.append(ansi().a(" [\\] "));
+                        builder.append(ansi().a(" [*] ")); // \\
                         break;
                     case 2:
                         builder.append(ansi().a(" [|] "));
                         break;
                     case 3:
-                        builder.append(ansi().a(" [/] "));
+                        builder.append(ansi().a(" [+] "));
                         break;
                     default:
                         anim = 0;
@@ -190,12 +196,14 @@ public class BetterThreadDisplayer extends Thread {
                 }
             }
 
+
+
             // Add the actual process details and finish the line
             final String name = thread.getName();
             final long now = thread.getNow();
             final long max = thread.getMax();
-            final byte percent = thread.getPercent();
-            final String status= thread.getStatus();
+            final byte percent  = thread.getPercent();
+            final String status = thread.getStatus();
 
             if (now > 0){
                 if (thread.isSkipped())
@@ -214,6 +222,7 @@ public class BetterThreadDisplayer extends Thread {
             // Add this message to the list
             list.add(new AttributedString(builder.toString()));
         });
+
         // This must be done outside the for loop otherwise the animation wont work
         anim++;
 

@@ -21,7 +21,7 @@
 
 
     <properties>
-        <final.name>AutoPlug</final.name>
+        <final.name>Better-Thread</final.name>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -43,7 +43,7 @@
 
         <dependency>
             <groupId>org.jline</groupId>
-            <artifactId>jline</artifactId>
+            <artifactId>jline-terminal-jansi</artifactId>
             <version>3.19.0</version>
         </dependency>
 
@@ -84,10 +84,13 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
-                    <!-- DO NOT include log4j.properties file in your Jar -->
-                    <excludes>
-                        <exclude>**/log4j.properties</exclude>
-                    </excludes>
+                    <outputDirectory>${basedir}</outputDirectory>
+                    <archive>
+                        <manifest>
+                            <!-- Jar file entry point -->
+                            <mainClass>com.osiris.betterthread.Main</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
 
