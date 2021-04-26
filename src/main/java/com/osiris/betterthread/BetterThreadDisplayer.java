@@ -10,7 +10,6 @@ package com.osiris.betterthread;
 
 
 import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
 import org.jline.terminal.Size;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
@@ -32,7 +31,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * Runs until there are no more active BetterThreads.
  */
 public class BetterThreadDisplayer extends Thread {
-    private Terminal terminal;
+    private final Terminal terminal;
     private Display display;
     private BetterThreadManager manager;
     private String label = "[MyAppName]";
@@ -182,13 +181,13 @@ public class BetterThreadDisplayer extends Thread {
             else{
                 switch (anim) {
                     case 1:
-                        builder.append(ansi().a(" [*] ")); // \\
+                        builder.append(ansi().a(" [\\] "));
                         break;
                     case 2:
                         builder.append(ansi().a(" [|] "));
                         break;
                     case 3:
-                        builder.append(ansi().a(" [+] "));
+                        builder.append(ansi().a(" [/] "));
                         break;
                     default:
                         anim = 0;
@@ -220,14 +219,14 @@ public class BetterThreadDisplayer extends Thread {
             builder.append(ansi().reset());
 
             // Add this message to the list
-            list.add(new AttributedString(builder.toString()));
+            list.add(AttributedString.fromAnsi(builder.toString()));
         });
 
         // This must be done outside the for loop otherwise the animation wont work
         anim++;
 
         if (manager.getAll().size()==0){
-            list.add(new AttributedString("No threads! Waiting..."));
+            list.add(AttributedString.fromAnsi("No threads! Waiting..."));
         }
         else{
             // This means we finished and should stop looping
@@ -235,6 +234,7 @@ public class BetterThreadDisplayer extends Thread {
             if (manager.isFinished()){
                 display.update(list, -1); // Update one last time
                 this.allWarnings = manager.getAllWarnings();
+                System.out.println(" ");
                 formatWarnings();
                 return false;
             }

@@ -17,6 +17,10 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
+        for (int i = 0; i < 30; i++) {
+            System.out.println("TEST");
+        }
+
         //new Main().replaceMultipleLinesTest();
         new Main().betterThreadDisplayerTest();
     }
@@ -54,14 +58,14 @@ public class Main {
 
     void betterThreadDisplayerTest() {
         BetterThreadManager manager = new BetterThreadManager();
-        BetterThread test1 = new BetterThread(manager);
-        test1.start();
-        BetterThread test2 = new BetterThread(manager);
-        test2.start();
-        BetterThread test3 = new BetterThread(manager);
-        test3.start();
+        BetterThread t1 = new BetterThread(manager);
+        t1.start();
+        BetterThread t2 = new BetterThread(manager);
+        t2.start();
+        BetterThread t3 = new BetterThread(manager);
+        t3.start();
         BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager);
-        displayer.setRefreshInterval(10);
+        //displayer.setRefreshInterval(10);
         displayer.start();
 
         // Its normal to get values over 100% because of this loop

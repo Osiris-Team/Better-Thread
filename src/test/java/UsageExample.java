@@ -16,8 +16,6 @@ public class UsageExample {
         // Note: This is only for explanation purposes. In production create this class inside a package.
         class MyFirstTask extends BetterThread{
 
-
-
             public MyFirstTask(BetterThreadManager manager, boolean autoStart) {
                 super(manager, autoStart);
             }
@@ -37,7 +35,7 @@ public class UsageExample {
         }
 
         // 4. Run the tasks
-        MyFirstTask task1 = new MyFirstTask(manager, true);
+        MyFirstTask task1 = new MyFirstTask(manager, true); // true to enable auto-start, so theres no need to call .start()
         MyFirstTask task2 = new MyFirstTask(manager, true);
         MyFirstTask task3 = new MyFirstTask(manager, true);
         MyFirstTask task4 = new MyFirstTask(manager, true);
