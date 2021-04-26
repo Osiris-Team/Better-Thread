@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.osiris.betterthread.Constants.DISPLAY;
+import static com.osiris.betterthread.Constants.TERMINAL;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -31,8 +33,6 @@ import static org.fusesource.jansi.Ansi.ansi;
  * Runs until there are no more active BetterThreads.
  */
 public class BetterThreadDisplayer extends Thread {
-    private final Terminal terminal;
-    private Display display;
     private BetterThreadManager manager;
     private String label = "[MyAppName]";
     private String threadType = "[PROCESS]";
@@ -103,32 +103,19 @@ public class BetterThreadDisplayer extends Thread {
 
         // Check if Jansi console was already started
         //AnsiConsole.systemInstall();
-        try{
-            terminal = TerminalBuilder.terminal();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("There was an error getting the systems terminal!");
-        }
     }
 
     @Override
     public void run() {
         super.run();
         try{
-            resize();
-            terminal.writer().println(" ");
+            //resize();
             while (printAll()){
                 sleep(refreshInterval);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void resize(){
-        display = new Display(terminal, false);
-        Size size = terminal.getSize(); // Need to initialize the size on the display with
-        display.resize(size.getRows(), size.getColumns());
     }
 
     /**
@@ -232,15 +219,15 @@ public class BetterThreadDisplayer extends Thread {
             // This means we finished and should stop looping
             // We print the last warnings message and stop.
             if (manager.isFinished()){
-                display.update(list, -1); // Update one last time
+                DISPLAY.update(list, -1); // Update one last time
                 this.allWarnings = manager.getAllWarnings();
-                System.out.println(" ");
+                TERMINAL.writer().println(" ");
                 formatWarnings();
                 return false;
             }
         }
 
-        display.update(list, -1);
+        DISPLAY.update(list, -1);
         return true;
     }
 
@@ -261,14 +248,14 @@ public class BetterThreadDisplayer extends Thread {
                 .reset();
 
         if (allWarnings.isEmpty()){
-            System.out.println(ansi()
+            TERMINAL.writer().println(ansi()
                     .a(ansiDate)
                     .fg(GREEN)
                     .a(" Executed all tasks successfully!")
                     .reset());
         }
         else if (showWarnings) {
-            System.out.println(ansi()
+            TERMINAL.writer().println(ansi()
                     .a(ansiDate)
                     .fg(YELLOW)
                     .a(" There are " + allWarnings.size() + " warnings:")
@@ -285,7 +272,7 @@ public class BetterThreadDisplayer extends Thread {
                                     "][Cause: " + betterWarning.getException().getCause() +
                                     "][Extra: " + betterWarning.getExtraInfo() +
                                     "][Trace: " + Arrays.toString(betterWarning.getException().getStackTrace())).reset());
-                    System.out.println(builder.toString());
+                    TERMINAL.writer().println(builder.toString());
                 }
             }
             else {
@@ -296,12 +283,12 @@ public class BetterThreadDisplayer extends Thread {
                     builder.append(ansiDate);
                     builder.append(ansi()
                             .fg(YELLOW).a("[WARNING-" + i + "][" + betterWarning.getThread().getName() + "][Message: " + betterWarning.getException().getMessage() + "]").reset());
-                    System.out.println(builder.toString());
+                    TERMINAL.writer().println(builder.toString());
                 }
             }
         }
         else{
-            System.out.println(ansi()
+            TERMINAL.writer().println(ansi()
                     .fg(YELLOW).a(" There are "+ allWarnings.size()+" warnings! Enable 'show-warnings' to view them, or check your log for further details!")
                     .reset());
         }

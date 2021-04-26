@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
+import static com.osiris.betterthread.Constants.DISPLAY;
+import static com.osiris.betterthread.Constants.TERMINAL;
+
 /**
  * Used for testing stuff in native
  * console windows.
@@ -23,23 +26,27 @@ public class Main {
 
         //new Main().replaceMultipleLinesTest();
         new Main().betterThreadDisplayerTest();
+        TERMINAL.writer().println("SIOJASDIOASD");
+        TERMINAL.writer().println("SIOJASDIOASD");
+        TERMINAL.writer().println("SIOJASDIOASD");
+        TERMINAL.writer().println("SIOJASDIOASD");
+        Thread.sleep(1000);
+        new Main().betterThreadDisplayerTest();
     }
 
-    private Terminal terminal;
-    private Display display;
+
     private int progress = 0;
 
     void replaceMultipleLinesTest() throws InterruptedException, IOException {
-        terminal = TerminalBuilder.terminal();
 
 
         for (int i = 0; i < 30; i++) {
-            terminal.writer().println("TEST");
+            TERMINAL.writer().println("TEST");
         }
 
-        resize();
+        //resize();
         for (int i = 0; i < 5; i++) {
-            display.update(Arrays.asList(
+            DISPLAY.update(Arrays.asList(
                     AttributedString.fromAnsi("Line 1 withgbuioasdigufsUIGIUGgifuiguFUIGPfuigbpFUIGfuigf data "+new Random().nextLong()*new Random().nextLong()+ i),
                     AttributedString.fromAnsi("Line 2 withDFBUIBUPdfbupiFUIPfubpuFBUPFUPGBIFagbupUPGFDUGPfugpFAGUPUGFagufgufaGUOPAfoaui data "+new Random().nextLong()*new Random().nextLong() + i),
                     AttributedString.fromAnsi("Line 3 withSbupiasfBUPIFSbupBUBFbuUOBAf data "+new Random().nextLong()*new Random().nextLong() + i),
@@ -47,13 +54,7 @@ public class Main {
             ), -1); //-1
             Thread.sleep(1000);
         }
-        terminal.writer().println(" ");
-    }
-
-    private void resize(){
-        display = new Display(terminal, false);
-        Size size = terminal.getSize(); // Need to initialize the size on the display with
-        display.resize(size.getRows(), size.getColumns());
+        TERMINAL.writer().println(" ");
     }
 
     void betterThreadDisplayerTest() {
