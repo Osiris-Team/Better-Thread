@@ -10,11 +10,7 @@ package com.osiris.betterthread;
 
 
 import org.fusesource.jansi.Ansi;
-import org.jline.terminal.Size;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedString;
-import org.jline.utils.Display;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -181,7 +177,6 @@ public class BetterThreadDisplayer extends Thread {
                         builder.append(ansi().a(" [-] "));
                 }
             }
-
 
 
             // Add the actual process details and finish the line

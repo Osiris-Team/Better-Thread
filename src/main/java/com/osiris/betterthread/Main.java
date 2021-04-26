@@ -1,17 +1,13 @@
 package com.osiris.betterthread;
 
-import org.jline.terminal.Size;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
+import com.osiris.betterthread.jline.MyLine;
 import org.jline.utils.AttributedString;
-import org.jline.utils.Display;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
-import static com.osiris.betterthread.Constants.DISPLAY;
-import static com.osiris.betterthread.Constants.TERMINAL;
+import static com.osiris.betterthread.Constants.*;
 
 /**
  * Used for testing stuff in native
@@ -24,6 +20,16 @@ public class Main {
             System.out.println("TEST");
         }
 
+        MY_DISPLAY.updateLines(new MyLine("hello1"));
+        Thread.sleep(1000);
+        MY_DISPLAY.updateLines(new MyLine("hello2"));
+        Thread.sleep(1000);
+        MY_DISPLAY.updateLines(new MyLine("hello3"));
+        Thread.sleep(1000);
+        MY_DISPLAY.updateLines(new MyLine("hello4"));
+        /*
+        new Main().testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages();
+
         //new Main().replaceMultipleLinesTest();
         new Main().betterThreadDisplayerTest();
         TERMINAL.writer().println("SIOJASDIOASD");
@@ -32,6 +38,8 @@ public class Main {
         TERMINAL.writer().println("SIOJASDIOASD");
         Thread.sleep(1000);
         new Main().betterThreadDisplayerTest();
+
+         */
     }
 
 
@@ -55,6 +63,57 @@ public class Main {
             Thread.sleep(1000);
         }
         TERMINAL.writer().println(" ");
+    }
+
+    void testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages() throws InterruptedException {
+        BetterThreadManager manager = new BetterThreadManager();
+
+        BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager);
+        //displayer.setRefreshInterval(10);
+        displayer.start();
+
+        // Its normal to get values over 100% because of this loop
+        Thread thread = new Thread(()->{
+            try {
+                while (!manager.isFinished())
+                    for (BetterThread t :
+                            manager.getAll()) {
+                        t.step();
+                        Thread.sleep(10);
+                    }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        thread.start();
+
+        BetterThread t1 = new BetterThread(manager);
+        t1.start();
+        TERMINAL.writer().println("ABUSUIODAS");
+        TERMINAL.writer().println("ABUSUIODAassdaS");
+        Thread.sleep(2000);
+        BetterThread t2 = new BetterThread(manager);
+        t2.start();
+        TERMINAL.writer().println("a");
+        TERMINAL.writer().println("b");
+
+        Thread.sleep(2000);
+        BetterThread t3 = new BetterThread(manager);
+        t3.start();
+
+        try{
+            while (!manager.isFinished())
+                Thread.sleep(1000);
+            boolean isWarning = false;
+            for (BetterThread t :
+                    manager.getAll()) {
+                if (!t.getBetterWarnings().isEmpty())
+                    isWarning = true;
+            }
+            //assertTrue(!isWarning);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     void betterThreadDisplayerTest() {
