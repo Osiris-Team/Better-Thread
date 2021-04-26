@@ -42,6 +42,9 @@ public class MyDisplay extends Display {
         return allLines.size()-1;
     }
 
+    public synchronized void add(String... lines){
+        addLines(lines);
+    }
 
     public synchronized void addLines(String... stringLines){
         Objects.requireNonNull(stringLines);
@@ -70,7 +73,7 @@ public class MyDisplay extends Display {
 
             // Check if l exists in the allLines list.
             // To be more exact. We check if l's position in the list exists.
-            // If it doesn't l gets added to the end of the allLines list.
+            // If it doesn't, l gets added to the end of the allLines list.
             // Also note that its desired position is ignored in that case.
             // Also note, that when its position is -1 it gets added to the end of the list no matter what.
             MyLine existingLine = null;
@@ -85,7 +88,8 @@ public class MyDisplay extends Display {
             }
             else{
                 // This means that l doesn't exist yet in the list and should be added.
-                addLineToLinesListAndGetPosition(l);
+                // Update its position value:
+                l.setPosition(addLineToLinesListAndGetPosition(l));
             }
         }
 

@@ -16,30 +16,29 @@ import static com.osiris.betterthread.Constants.*;
 public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
+
         for (int i = 0; i < 30; i++) {
-            System.out.println("TEST");
+            MY_DISPLAY.add("TEST");
         }
 
-        MY_DISPLAY.updateLines(new MyLine("hello1"));
-        Thread.sleep(1000);
-        MY_DISPLAY.updateLines(new MyLine("hello2"));
-        Thread.sleep(1000);
-        MY_DISPLAY.updateLines(new MyLine("hello3"));
-        Thread.sleep(1000);
-        MY_DISPLAY.updateLines(new MyLine("hello4"));
-        /*
-        new Main().testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages();
+
+        //new Main().testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages();
 
         //new Main().replaceMultipleLinesTest();
-        new Main().betterThreadDisplayerTest();
-        TERMINAL.writer().println("SIOJASDIOASD");
-        TERMINAL.writer().println("SIOJASDIOASD");
-        TERMINAL.writer().println("SIOJASDIOASD");
-        TERMINAL.writer().println("SIOJASDIOASD");
+        //new Main().betterThreadDisplayerTest();
+        MY_DISPLAY.add("SIOJASDIOASD");
+        MY_DISPLAY.add("SIOJASDIOASD");
+        MY_DISPLAY.add("SIOJASDIOASD");
+        MY_DISPLAY.add("latest");
         Thread.sleep(1000);
-        new Main().betterThreadDisplayerTest();
+        MY_DISPLAY.updateLines(new MyLine("BIG BOIII SKRR", MY_DISPLAY.getNewestLinesPosition()));
+        Thread.sleep(1000);
+        MY_DISPLAY.updateLines(new MyLine("GANG GANG WE LIT BOIIIII", MY_DISPLAY.getNewestLinesPosition()));
+        Thread.sleep(1000);
 
-         */
+        MY_DISPLAY.updateLines(new MyLine("GANG GANG WE LIT BOIIIII", MY_DISPLAY.getNewestLinesPosition()-3));
+        Thread.sleep(1000);
+        //new Main().betterThreadDisplayerTest();
     }
 
 

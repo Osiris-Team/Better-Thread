@@ -216,7 +216,7 @@ public class BetterThreadDisplayer extends Thread {
             if (manager.isFinished()){
                 DISPLAY.update(list, -1); // Update one last time
                 this.allWarnings = manager.getAllWarnings();
-                TERMINAL.writer().println(" ");
+                //TERMINAL.writer().println(" ");
                 formatWarnings();
                 return false;
             }
