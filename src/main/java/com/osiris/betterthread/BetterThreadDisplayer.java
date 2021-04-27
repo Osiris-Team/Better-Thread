@@ -37,7 +37,6 @@ public class BetterThreadDisplayer extends Thread {
     private boolean showDetailedWarnings;
     private int refreshInterval;
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private List<BetterWarning> allWarnings = new ArrayList<>();
 
     private byte anim;
 
@@ -215,9 +214,8 @@ public class BetterThreadDisplayer extends Thread {
             // We print the last warnings message and stop.
             if (manager.isFinished()){
                 DISPLAY.update(list, -1); // Update one last time
-                this.allWarnings = manager.getAllWarnings();
                 //TERMINAL.writer().println(" ");
-                formatWarnings();
+                formatWarnings(manager.getAllWarnings());
                 return false;
             }
         }
@@ -232,8 +230,9 @@ public class BetterThreadDisplayer extends Thread {
 
     /**
      * This is will be shown when all processes finished.
+     * @param allWarnings
      */
-    private void formatWarnings(){
+    private void formatWarnings(List<BetterWarning> allWarnings){
 
         Ansi ansiDate = ansi()
                 .bg(WHITE)
@@ -345,11 +344,4 @@ public class BetterThreadDisplayer extends Thread {
         this.dateFormatter = dateFormatter;
     }
 
-    public List<BetterWarning> getAllWarnings() {
-        return allWarnings;
-    }
-
-    public void setAllWarnings(List<BetterWarning> allWarnings) {
-        this.allWarnings = allWarnings;
-    }
 }

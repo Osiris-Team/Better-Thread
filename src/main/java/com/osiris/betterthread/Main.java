@@ -5,6 +5,7 @@ import org.jline.utils.AttributedString;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 import static com.osiris.betterthread.Constants.*;
@@ -17,15 +18,45 @@ public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        for (int i = 0; i < 30; i++) {
-            MY_DISPLAY.add("TEST");
+
+        for (long i = 0; i < 10000; i++) {
+            DISPLAY.update(Arrays.asList(AttributedString.fromAnsi("["+i+"] "+getRandomString())), -1);
         }
 
+         /*
+
+        MY_DISPLAY.updateLines(new MyLine("1 CHANGED "));
+        MY_DISPLAY.updateLines(new MyLine("2 CHANGED "));
+        MY_DISPLAY.updateLines(new MyLine("3 CHANGED "));
+        Thread.sleep(1000);
+        MY_DISPLAY.updateLines(new MyLine("1 CHANGED 21"+1+"", 0));
+        MY_DISPLAY.updateLines(new MyLine("2 CHANGED 12"+33+"\n", 1));
+        MY_DISPLAY.updateLines(new MyLine("3 CHANGED 12"+44+"\n", 2));
+        Thread.sleep(1000);
+        MY_DISPLAY.updateLines(new MyLine("1 CHANGED ", 0));
+        MY_DISPLAY.updateLines(new MyLine("2 CHANGED ", 1));
+        MY_DISPLAY.updateLines(new MyLine("3 CHANGED ", 2));
+        */
+
+        //new Main().testUpdatingLimit();
+        /*
+        for (int i = 0; i < 30; i++) {
+            TERMINAL.writer().println("TEST");
+        }
+
+        // erase the lines
+        Thread.sleep(1000);
+        MY_DISPLAY.update(Collections.emptyList(), 0);
+        // ... print lines to the terminal
+        TERMINAL.writer().println("TEST");
+        // usual print
+        MY_DISPLAY.update(Arrays.asList(AttributedString.fromAnsi("TEST-UPDATED")), -1);
 
         //new Main().testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages();
-
+*/
         //new Main().replaceMultipleLinesTest();
         //new Main().betterThreadDisplayerTest();
+        /*
         MY_DISPLAY.add("SIOJASDIOASD");
         MY_DISPLAY.add("SIOJASDIOASD");
         MY_DISPLAY.add("SIOJASDIOASD");
@@ -39,6 +70,29 @@ public class Main {
         MY_DISPLAY.updateLines(new MyLine("GANG GANG WE LIT BOIIIII", MY_DISPLAY.getNewestLinesPosition()-3));
         Thread.sleep(1000);
         //new Main().betterThreadDisplayerTest();
+
+         */
+    }
+
+    void testUpdatingLimit(){
+        for (long i = 0; i < Long.MAX_VALUE; i++) {
+            MY_DISPLAY.add("["+i+"] "+getRandomString());
+        }
+    }
+
+    private static String getRandomString() {
+        int leftLimit = 48; // numeral '0'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 200;
+        Random random = new Random();
+
+        String generatedString = random.ints(leftLimit, rightLimit + 1)
+                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+
+        return generatedString;
     }
 
 

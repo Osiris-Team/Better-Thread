@@ -5,15 +5,30 @@ import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedString;
 import org.jline.utils.Display;
 
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 public class MyDisplay extends Display {
     private List<MyLine> allLines = new ArrayList<>(); // Note that lines should never get removed from this list!
+    Thread systemOutListenerThread;
 
     public MyDisplay(Terminal terminal, boolean fullscreen) {
         super(terminal, fullscreen);
+        initSystemOutListener();
+    }
+
+    private void initSystemOutListener() {
+        if (systemOutListenerThread==null){
+            systemOutListenerThread = new Thread(()->{
+
+            });
+            systemOutListenerThread.start();
+        }
     }
 
 
@@ -93,6 +108,8 @@ public class MyDisplay extends Display {
             }
         }
 
+        // erase the lines
+        //this.update(Collections.emptyList(), 0);
         this.update(convertToAttributedStringList(allLines), -1);
     }
 
