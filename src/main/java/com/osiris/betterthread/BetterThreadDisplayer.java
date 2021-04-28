@@ -18,8 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.osiris.betterthread.Constants.DISPLAY;
-import static com.osiris.betterthread.Constants.TERMINAL;
+import static com.osiris.betterthread.Constants.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
 

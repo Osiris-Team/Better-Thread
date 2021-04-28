@@ -17,13 +17,25 @@ import static com.osiris.betterthread.Constants.*;
 public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
+        for (int i = 0; i < 100; i++) {
+            //TERMINAL.writer().println("TEST");
+            MY_DISPLAY.add("TEST");
+        }
+// usual print
+        Thread.sleep(1000);
+        MY_DISPLAY.updateLine(0, "0");
+        Thread.sleep(1000);
+        MY_DISPLAY.updateLine(10, "10");
+        Thread.sleep(1000);
+        MY_DISPLAY.updateLine(25, "25");
+        //new Main().betterThreadDisplayerTest();
 
-
+/*
         for (long i = 0; i < 10000; i++) {
             DISPLAY.update(Arrays.asList(AttributedString.fromAnsi("["+i+"] "+getRandomString())), -1);
         }
 
-         /*
+
 
         MY_DISPLAY.updateLines(new MyLine("1 CHANGED "));
         MY_DISPLAY.updateLines(new MyLine("2 CHANGED "));
@@ -49,13 +61,12 @@ public class Main {
         MY_DISPLAY.update(Collections.emptyList(), 0);
         // ... print lines to the terminal
         TERMINAL.writer().println("TEST");
-        // usual print
-        MY_DISPLAY.update(Arrays.asList(AttributedString.fromAnsi("TEST-UPDATED")), -1);
+
 
         //new Main().testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages();
 */
         //new Main().replaceMultipleLinesTest();
-        //new Main().betterThreadDisplayerTest();
+        //
         /*
         MY_DISPLAY.add("SIOJASDIOASD");
         MY_DISPLAY.add("SIOJASDIOASD");

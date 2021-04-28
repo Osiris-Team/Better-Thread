@@ -8,10 +8,10 @@ import org.jline.utils.Display;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+
+import static com.osiris.betterthread.Constants.MY_DISPLAY;
+import static com.osiris.betterthread.Constants.TERMINAL;
 
 public class MyDisplay extends Display {
     private List<MyLine> allLines = new ArrayList<>(); // Note that lines should never get removed from this list!
@@ -108,9 +108,13 @@ public class MyDisplay extends Display {
             }
         }
 
+
         // erase the lines
         //this.update(Collections.emptyList(), 0);
         this.update(convertToAttributedStringList(allLines), -1);
     }
 
+    public synchronized void updateLine(int position, String newLine) {
+        updateLines(new MyLine(newLine, position));
+    }
 }

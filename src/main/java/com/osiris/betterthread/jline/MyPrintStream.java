@@ -34,6 +34,7 @@ public class MyPrintStream extends PrintStream {
         super.write(buf, off, len);
     }
 
+
     /*
     @Override
     public void write(byte[] buf) throws IOException {
@@ -46,6 +47,7 @@ public class MyPrintStream extends PrintStream {
     }
 
      */
+
 
     @Override
     public void print(boolean b) {
