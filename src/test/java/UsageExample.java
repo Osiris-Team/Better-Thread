@@ -1,10 +1,11 @@
 import com.osiris.betterthread.BetterThread;
 import com.osiris.betterthread.BetterThreadDisplayer;
 import com.osiris.betterthread.BetterThreadManager;
+import com.osiris.betterthread.exceptions.JLineLinkException;
 
 public class UsageExample {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JLineLinkException {
 
         // 1. Create the manager
         BetterThreadManager manager = new BetterThreadManager();

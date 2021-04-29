@@ -1,5 +1,6 @@
 package com.osiris.betterthread;
 
+import com.osiris.betterthread.exceptions.JLineLinkException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BetterThreadDisplayerTest {
 
     @Test
-    void test() {
+    void test() throws JLineLinkException {
         BetterThreadManager manager = new BetterThreadManager();
         BetterThread test1 = new BetterThread(manager);
         test1.start();

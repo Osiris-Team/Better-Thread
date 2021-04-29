@@ -9,9 +9,16 @@
 package com.osiris.betterthread;
 
 
+import com.osiris.betterthread.exceptions.JLineLinkException;
+import com.osiris.betterthread.jline.MyPrintStream;
 import org.fusesource.jansi.Ansi;
+import org.jline.terminal.Size;
+import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedString;
+import org.jline.utils.Display;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -28,9 +35,11 @@ import static org.fusesource.jansi.Ansi.ansi;
  * Runs until there are no more active BetterThreads.
  */
 public class BetterThreadDisplayer extends Thread {
+    private Terminal terminal;
+    private Display display;
     private BetterThreadManager manager;
     private String label = "[MyAppName]";
-    private String threadType = "[PROCESS]";
+    private String threadLabel = "[PROCESS]";
     private LocalDateTime now;
     private boolean showWarnings;
     private boolean showDetailedWarnings;
@@ -45,31 +54,31 @@ public class BetterThreadDisplayer extends Thread {
      * To customize these values use the other constructor.
      * @param manager
      */
-    public BetterThreadDisplayer(BetterThreadManager manager) {
+    public BetterThreadDisplayer(BetterThreadManager manager) throws JLineLinkException {
         this(manager, null);
     }
 
-    public BetterThreadDisplayer(BetterThreadManager manager, String label) {
+    public BetterThreadDisplayer(BetterThreadManager manager, String label) throws JLineLinkException {
         this(manager, label, null);
     }
 
-    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadType) {
-        this(manager, label, threadType, null);
+    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadLabel) throws JLineLinkException {
+        this(manager, label, threadLabel, null);
     }
 
-    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadType,
-                                 DateTimeFormatter formatter) {
-        this(manager, label, threadType, formatter, false);
+    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadLabel,
+                                 DateTimeFormatter formatter) throws JLineLinkException {
+        this(manager, label, threadLabel, formatter, false);
     }
 
-    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadType,
-                                 DateTimeFormatter formatter, boolean showWarnings) {
-        this(manager, label, threadType, formatter, showWarnings, false);
+    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadLabel,
+                                 DateTimeFormatter formatter, boolean showWarnings) throws JLineLinkException {
+        this(manager, label, threadLabel, formatter, showWarnings, false);
     }
 
-    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadType,
-                                 DateTimeFormatter formatter, boolean showWarnings, boolean showDetailedWarnings) {
-        this(manager, label, threadType, formatter, showWarnings, showDetailedWarnings, 250);
+    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadLabel,
+                                 DateTimeFormatter formatter, boolean showWarnings, boolean showDetailedWarnings) throws JLineLinkException {
+        this(manager, label, threadLabel, formatter, showWarnings, showDetailedWarnings, 250);
     }
 
     /**
@@ -78,32 +87,44 @@ public class BetterThreadDisplayer extends Thread {
      * passing over the wanted values.
      * @param manager
      * @param label
-     * @param threadType
+     * @param threadLabel
      * @param formatter
      * @param showWarnings
      * @param showDetailedWarnings
      * @param refreshInterval
      * @throws RuntimeException if there was an error getting the systems terminal.
      */
-    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadType, DateTimeFormatter formatter,
-                                 boolean showWarnings, boolean showDetailedWarnings, int refreshInterval) {
+    public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadLabel, DateTimeFormatter formatter,
+                                 boolean showWarnings, boolean showDetailedWarnings, int refreshInterval) throws JLineLinkException {
         this.manager = manager;
         if (label!=null) this.label = label;
-        if (threadType!=null) this.threadType = threadType;
+        if (threadLabel !=null) this.threadLabel = threadLabel;
         if (formatter!=null) this.dateFormatter = formatter;
         this.showWarnings = showWarnings;
         this.showDetailedWarnings = showDetailedWarnings;
         this.refreshInterval = refreshInterval;
 
-        // Check if Jansi console was already started
-        //AnsiConsole.systemInstall();
+
+        try{
+            // Init the display/section
+            display = new Display(TERMINAL, false);
+            Size size = TERMINAL.getSize(); // Need to initialize the size on the display with
+            display.resize(size.getRows(), size.getColumns());
+        } catch (Exception e) {
+            throw new JLineLinkException("Failed to initialize JLines Display class! Details: "+e.getMessage());
+        }
     }
 
     @Override
     public void run() {
         super.run();
         try{
-            //resize();
+            // Since we don't want any other messages
+            // to get printed to the console, while we are doing or stuff,
+            // we temporarily set the System.out to a custom PrintStream,
+            // which captures all messages send during this period
+            // and prints them when we are done.
+
             while (printAll()){
                 sleep(refreshInterval);
             }
@@ -137,7 +158,7 @@ public class BetterThreadDisplayer extends Thread {
                     .bg(WHITE)
                     .fg(BLACK).a("["+dateFormatter.format(now)+"]")
                     .fg(CYAN).a(label)
-                    .fg(BLACK).a(threadType)
+                    .fg(BLACK).a(threadLabel)
                     .reset());
 
             //Add the loading animation
@@ -287,6 +308,17 @@ public class BetterThreadDisplayer extends Thread {
         }
     }
 
+    /**
+     * This is the link to the JLine API. <br>
+     * {@link Display} is a section/part/paragraph of the terminal/console made out of lines. <br>
+     * Those lines can get updated/added/removed by the {@link Display} class. <br>
+     * In our case each line represents a {@link BetterThread}s progress <br>
+     * and all those lines are updated/managed by this {@link Display}.
+     */
+    public Display getDisplay() {
+        return display;
+    }
+
     public BetterThreadManager getManager() {
         return manager;
     }
@@ -303,12 +335,12 @@ public class BetterThreadDisplayer extends Thread {
         this.label = label;
     }
 
-    public String getThreadType() {
-        return threadType;
+    public String getThreadLabel() {
+        return threadLabel;
     }
 
-    public void setThreadType(String threadType) {
-        this.threadType = threadType;
+    public void setThreadLabel(String threadLabel) {
+        this.threadLabel = threadLabel;
     }
 
     public boolean isShowWarnings() {

@@ -1,11 +1,15 @@
 package com.osiris.betterthread;
 
-import com.osiris.betterthread.jline.MyLine;
+import com.osiris.betterthread.exceptions.JLineLinkException;
+import com.osiris.betterthread.jline.MyPrintStream;
+import com.osiris.betterthread.jline.MySection;
+import org.jline.terminal.Size;
 import org.jline.utils.AttributedString;
+import org.jline.utils.Display;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Random;
 
 import static com.osiris.betterthread.Constants.*;
@@ -17,6 +21,32 @@ import static com.osiris.betterthread.Constants.*;
 public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
+        System.out.println("TEST");
+        //MySection line = new MySection("Your lines content here!", 0);
+        //MY_DISPLAY.updateLine(line);
+        PrintStream old = System.out;
+        MyPrintStream myPrintStream = new MyPrintStream(old);
+        System.setOut(myPrintStream);
+        System.out.println("THIS SHOULD NOT GET PRINTED");
+        Display display = new Display(TERMINAL, false);
+        Size size = TERMINAL.getSize(); // Need to initialize the size on the display with
+        display.resize(size.getRows(), size.getColumns());
+        display.update(Arrays.asList(AttributedString.fromAnsi("THIS SHOULD BE SHOWN!")), -1);
+
+        /*
+        new Thread(()->{
+            try{
+                while (true){
+                    Thread.sleep(1000);
+                    Size size = TERMINAL.getSize(); // Need to initialize the size on the display with
+                    System.out.println("ROWS/HEIGHT: "+size.getRows()+" COLUMNS/WIDTH: "+ size.getColumns());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+
         for (int i = 0; i < 100; i++) {
             //TERMINAL.writer().println("TEST");
             MY_DISPLAY.add("TEST");
@@ -30,7 +60,7 @@ public class Main {
         MY_DISPLAY.updateLine(25, "25");
         //new Main().betterThreadDisplayerTest();
 
-/*
+
         for (long i = 0; i < 10000; i++) {
             DISPLAY.update(Arrays.asList(AttributedString.fromAnsi("["+i+"] "+getRandomString())), -1);
         }
@@ -129,7 +159,7 @@ public class Main {
         TERMINAL.writer().println(" ");
     }
 
-    void testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages() throws InterruptedException {
+    void testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages() throws InterruptedException, JLineLinkException {
         BetterThreadManager manager = new BetterThreadManager();
 
         BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager);
@@ -180,7 +210,7 @@ public class Main {
         }
     }
 
-    void betterThreadDisplayerTest() {
+    void betterThreadDisplayerTest() throws JLineLinkException {
         BetterThreadManager manager = new BetterThreadManager();
         BetterThread t1 = new BetterThread(manager);
         t1.start();

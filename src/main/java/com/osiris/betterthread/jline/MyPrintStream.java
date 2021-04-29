@@ -1,147 +1,158 @@
 package com.osiris.betterthread.jline;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.Locale;
 
 /**
- * Redirects its output to the Terminal.
+ * Caches everything send to this PrintStream
+ * instead of printing it.
  */
 public class MyPrintStream extends PrintStream {
-    private MyDisplay display;
+    private final StringBuilder cache = new StringBuilder();
 
-    public MyPrintStream(OutputStream out, MyDisplay display) {
+    public MyPrintStream(OutputStream out) {
         super(out);
-        this.display = display;
     }
 
-    public MyDisplay getDisplay() {
-        return display;
+    public String getCacheAsString(){
+        return cache.toString();
     }
 
     @Override
     public void flush() {
-        super.flush();
+        // Does nothing
     }
 
     @Override
     public void write(int b) {
-        super.write(b);
+        synchronized (this) {
+            try(CharArrayWriter writer = new CharArrayWriter()){
+                writer.write(b);
+                cache.append(writer);
+            }
+        }
     }
 
     @Override
     public void write(byte[] buf, int off, int len) {
-        super.write(buf, off, len);
+        try {
+            synchronized (this) {
+                try(ByteArrayOutputStream tempOut = new ByteArrayOutputStream()){
+                    tempOut.write(buf, off, len);
+                    cache.append(tempOut);
+                }
+            }
+        }
+        catch (InterruptedIOException x) {
+            Thread.currentThread().interrupt();
+        }
+        catch (IOException x) {
+            //trouble = true;
+        }
     }
 
-
-    /*
-    @Override
-    public void write(byte[] buf) throws IOException {
-        super.write(buf);
+    private void write(String s) {
+        synchronized (this) {
+            cache.append(s);
+        }
     }
-
-    @Override
-    public void writeBytes(byte[] buf) {
-        super.writeBytes(buf);
-    }
-
-     */
 
 
     @Override
     public void print(boolean b) {
-        super.print(b);
+        write(String.valueOf(b));
     }
 
     @Override
     public void print(char c) {
-        super.print(c);
+        write(String.valueOf(c));
     }
 
     @Override
     public void print(int i) {
-        super.print(i);
+        write(String.valueOf(i));
     }
 
     @Override
     public void print(long l) {
-        super.print(l);
+        write(String.valueOf(l));
     }
 
     @Override
     public void print(float f) {
-        super.print(f);
+        write(String.valueOf(f));
     }
 
     @Override
     public void print(double d) {
-        super.print(d);
+        write(String.valueOf(d));
     }
 
     @Override
     public void print(char[] s) {
-        super.print(s);
+        write(String.valueOf(s));
     }
 
     @Override
     public void print(String s) {
-        super.print(s);
+        write(String.valueOf(s));
     }
 
     @Override
     public void print(Object obj) {
-        super.print(obj);
+        write(String.valueOf(obj));
     }
+
+    // TODO BELOW
 
     @Override
     public void println() {
-        super.println();
+        //super.println();
     }
 
     @Override
     public void println(boolean x) {
-        super.println(x);
+        //super.println(x);
     }
 
     @Override
     public void println(char x) {
-        super.println(x);
+        //super.println(x);
     }
 
     @Override
     public void println(int x) {
-        super.println(x);
+        //super.println(x);
     }
 
     @Override
     public void println(long x) {
-        super.println(x);
+        //super.println(x);
     }
 
     @Override
     public void println(float x) {
-        super.println(x);
+        //super.println(x);
     }
 
     @Override
     public void println(double x) {
-        super.println(x);
+        //super.println(x);
     }
 
     @Override
     public void println(char[] x) {
-        super.println(x);
+        //super.println(x);
     }
 
     @Override
     public void println(String x) {
-        super.println(x);
+        //super.println(x);
     }
 
     @Override
     public void println(Object x) {
-        super.println(x);
+        //super.println(x);
     }
 
     @Override
