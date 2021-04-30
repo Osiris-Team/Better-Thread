@@ -22,12 +22,4 @@ class MyPrintStreamTest {
         }
     }
 
-    @Test
-    void bufferStuff() {
-        PrintStream old = System.out;
-        MyPrintStream myPrintStream = new MyPrintStream();
-        System.setOut(myPrintStream);
-        System.out.println("TEST");
-        // TODO
-    }
 }
