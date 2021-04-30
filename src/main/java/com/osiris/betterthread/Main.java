@@ -2,7 +2,6 @@ package com.osiris.betterthread;
 
 import com.osiris.betterthread.exceptions.JLineLinkException;
 import com.osiris.betterthread.jline.MyPrintStream;
-import com.osiris.betterthread.jline.MySection;
 import org.jline.terminal.Size;
 import org.jline.utils.AttributedString;
 import org.jline.utils.Display;
@@ -20,10 +19,12 @@ import static com.osiris.betterthread.Constants.*;
  */
 public class Main {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException, JLineLinkException {
+        new Main().betterThreadDisplayerTest();
         System.out.println("TEST");
         //MySection line = new MySection("Your lines content here!", 0);
         //MY_DISPLAY.updateLine(line);
+        /*
         PrintStream old = System.out;
         MyPrintStream myPrintStream = new MyPrintStream();
         System.setOut(myPrintStream);
@@ -33,7 +34,7 @@ public class Main {
         display.resize(size.getRows(), size.getColumns());
         display.update(Arrays.asList(AttributedString.fromAnsi("THIS SHOULD BE SHOWN!")), -1);
 
-        /*
+
         new Thread(()->{
             try{
                 while (true){
@@ -117,7 +118,7 @@ public class Main {
 
     void testUpdatingLimit(){
         for (long i = 0; i < Long.MAX_VALUE; i++) {
-            MY_DISPLAY.add("["+i+"] "+getRandomString());
+            //MY_DISPLAY.add("["+i+"] "+getRandomString());
         }
     }
 
@@ -139,25 +140,6 @@ public class Main {
 
     private int progress = 0;
 
-    void replaceMultipleLinesTest() throws InterruptedException, IOException {
-
-
-        for (int i = 0; i < 30; i++) {
-            TERMINAL.writer().println("TEST");
-        }
-
-        //resize();
-        for (int i = 0; i < 5; i++) {
-            DISPLAY.update(Arrays.asList(
-                    AttributedString.fromAnsi("Line 1 withgbuioasdigufsUIGIUGgifuiguFUIGPfuigbpFUIGfuigf data "+new Random().nextLong()*new Random().nextLong()+ i),
-                    AttributedString.fromAnsi("Line 2 withDFBUIBUPdfbupiFUIPfubpuFBUPFUPGBIFagbupUPGFDUGPfugpFAGUPUGFagufgufaGUOPAfoaui data "+new Random().nextLong()*new Random().nextLong() + i),
-                    AttributedString.fromAnsi("Line 3 withSbupiasfBUPIFSbupBUBFbuUOBAf data "+new Random().nextLong()*new Random().nextLong() + i),
-                    AttributedString.fromAnsi("Line 4 withaZ()?AFzfzfAZ()()ASF9ha89023u´´902387370c370232356 0256 0c325602560025025 79 0´257´90 0307´237´90235´7902´069 215´90 data "+new Random().nextLong()*new Random().nextLong() + i)
-            ), -1); //-1
-            Thread.sleep(1000);
-        }
-        TERMINAL.writer().println(" ");
-    }
 
     void testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages() throws InterruptedException, JLineLinkException {
         BetterThreadManager manager = new BetterThreadManager();
@@ -230,6 +212,7 @@ public class Main {
                             manager.getAll()) {
                         t.step();
                         Thread.sleep(10);
+                        System.out.println("TEST");
                     }
             } catch (InterruptedException e) {
                 e.printStackTrace();

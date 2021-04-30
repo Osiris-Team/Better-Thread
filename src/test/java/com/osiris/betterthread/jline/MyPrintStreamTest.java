@@ -7,7 +7,6 @@ import java.io.*;
 
 class MyPrintStreamTest {
 
-    private static final JLineSection MY_DISPLAY = Constants.MY_DISPLAY;
 
     @Test
     void maxBuffer() {

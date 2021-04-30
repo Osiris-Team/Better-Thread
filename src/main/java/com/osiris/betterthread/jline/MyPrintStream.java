@@ -24,10 +24,17 @@ public class MyPrintStream extends PrintStream {
         this.cache2 = cache2;
     }
 
+    /**
+     * Only stores stuff from the format methods.
+     */
     public ByteArrayOutputStream getCache2() {
         return cache2;
     }
 
+    /**
+     * The main cache that stores everything except
+     * stuff from the format methods.
+     */
     public String getCache1(){
         return cache1.toString();
     }

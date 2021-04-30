@@ -19,6 +19,7 @@ import org.jline.utils.Display;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -124,10 +125,22 @@ public class BetterThreadDisplayer extends Thread {
             // we temporarily set the System.out to a custom PrintStream,
             // which captures all messages send during this period
             // and prints them when we are done.
+            PrintStream originalOut = System.out;
+            MyPrintStream customOut = new MyPrintStream();
+            System.setOut(customOut);
 
             while (printAll()){
                 sleep(refreshInterval);
             }
+
+            // Restore the output and print missed messages
+            System.setOut(originalOut);
+            if (!customOut.getCache1().isEmpty() || !customOut.getCache2().toString().isEmpty()){
+                System.out.println("Missed messages: ");
+                System.out.println(customOut.getCache1());
+                System.out.println(customOut.getCache2().toString());
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -233,14 +246,14 @@ public class BetterThreadDisplayer extends Thread {
             // This means we finished and should stop looping
             // We print the last warnings message and stop.
             if (manager.isFinished()){
-                DISPLAY.update(list, -1); // Update one last time
+                display.update(list, -1); // Update one last time
                 //TERMINAL.writer().println(" ");
                 formatWarnings(manager.getAllWarnings());
                 return false;
             }
         }
 
-        DISPLAY.update(list, -1);
+        display.update(list, -1);
         return true;
     }
 
