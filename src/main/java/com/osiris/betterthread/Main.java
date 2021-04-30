@@ -25,7 +25,7 @@ public class Main {
         //MySection line = new MySection("Your lines content here!", 0);
         //MY_DISPLAY.updateLine(line);
         PrintStream old = System.out;
-        MyPrintStream myPrintStream = new MyPrintStream(old);
+        MyPrintStream myPrintStream = new MyPrintStream();
         System.setOut(myPrintStream);
         System.out.println("THIS SHOULD NOT GET PRINTED");
         Display display = new Display(TERMINAL, false);

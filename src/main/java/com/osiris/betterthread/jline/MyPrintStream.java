@@ -1,6 +1,7 @@
 package com.osiris.betterthread.jline;
 
 import java.io.*;
+import java.util.Formatter;
 import java.util.Locale;
 
 /**
@@ -8,14 +9,27 @@ import java.util.Locale;
  * instead of printing it.
  */
 public class MyPrintStream extends PrintStream {
-    private final StringBuilder cache = new StringBuilder();
+    // We got 2 caches, because the second one can only hold a small
+    // amount of information and thus is used only for the format methods.
+    private final StringBuilder cache1 = new StringBuilder(); // Contains all the main stuff
+    private ByteArrayOutputStream cache2; // Only contains stuff from format methods
+    private Formatter formatter;
 
-    public MyPrintStream(OutputStream out) {
-        super(out);
+    public MyPrintStream(){
+        this(new ByteArrayOutputStream());
     }
 
-    public String getCacheAsString(){
-        return cache.toString();
+    public MyPrintStream(ByteArrayOutputStream cache2){
+        super(cache2);
+        this.cache2 = cache2;
+    }
+
+    public ByteArrayOutputStream getCache2() {
+        return cache2;
+    }
+
+    public String getCache1(){
+        return cache1.toString();
     }
 
     @Override
@@ -23,12 +37,30 @@ public class MyPrintStream extends PrintStream {
         // Does nothing
     }
 
+    /*
+    THESE METHODS CAN'T GET OVERWRITTEN BECAUSE
+    THEY WERE ADDED IN JAVA 14.
+    THIS MEANS THAT INFORMATION WRITTEN TO
+    THIS STREAM VIA THOSE METHODS GETS LOST!
+
+    @Override
+    public void write(byte[] buf) throws IOException {
+        super.write(buf);
+    }
+
+    @Override
+    public void writeBytes(byte[] buf) {
+        super.writeBytes(buf);
+    }
+
+     */
+
     @Override
     public void write(int b) {
         synchronized (this) {
             try(CharArrayWriter writer = new CharArrayWriter()){
                 writer.write(b);
-                cache.append(writer);
+                cache1.append(writer);
             }
         }
     }
@@ -39,7 +71,7 @@ public class MyPrintStream extends PrintStream {
             synchronized (this) {
                 try(ByteArrayOutputStream tempOut = new ByteArrayOutputStream()){
                     tempOut.write(buf, off, len);
-                    cache.append(tempOut);
+                    cache1.append(tempOut);
                 }
             }
         }
@@ -53,10 +85,16 @@ public class MyPrintStream extends PrintStream {
 
     private void write(String s) {
         synchronized (this) {
-            cache.append(s);
+            cache1.append(s);
         }
     }
 
+    private void writeln(String s) {
+        synchronized (this) {
+            cache1.append(s);
+            cache1.append(System.lineSeparator());
+        }
+    }
 
     @Override
     public void print(boolean b) {
@@ -103,90 +141,115 @@ public class MyPrintStream extends PrintStream {
         write(String.valueOf(obj));
     }
 
-    // TODO BELOW
+
+
 
     @Override
     public void println() {
-        //super.println();
+        writeln("");
     }
 
     @Override
     public void println(boolean x) {
-        //super.println(x);
+        writeln(String.valueOf(x));
     }
 
     @Override
     public void println(char x) {
-        //super.println(x);
+        writeln(String.valueOf(x));
     }
 
     @Override
     public void println(int x) {
-        //super.println(x);
+        writeln(String.valueOf(x));
     }
 
     @Override
     public void println(long x) {
-        //super.println(x);
+        writeln(String.valueOf(x));
     }
 
     @Override
     public void println(float x) {
-        //super.println(x);
+        writeln(String.valueOf(x));
     }
 
     @Override
     public void println(double x) {
-        //super.println(x);
+        writeln(String.valueOf(x));
     }
 
     @Override
     public void println(char[] x) {
-        //super.println(x);
+        writeln(String.valueOf(x));
     }
 
     @Override
     public void println(String x) {
-        //super.println(x);
+        writeln(String.valueOf(x));
     }
 
     @Override
     public void println(Object x) {
-        //super.println(x);
+        writeln(String.valueOf(x));
     }
+
+
+
 
     @Override
     public PrintStream printf(String format, Object... args) {
-        return super.printf(format, args);
+        return this.format(format, args);
     }
 
     @Override
     public PrintStream printf(Locale l, String format, Object... args) {
-        return super.printf(l, format, args);
+        return this.format(l, format, args);
     }
 
     @Override
     public PrintStream format(String format, Object... args) {
-        return super.format(format, args);
+        synchronized (this) {
+            if ((formatter == null)
+                    || (formatter.locale() !=
+                    Locale.getDefault(Locale.Category.FORMAT)))
+                formatter = new Formatter((Appendable) this);
+            formatter.format(Locale.getDefault(Locale.Category.FORMAT),
+                    format, args);
+        }
+        return this;
     }
 
     @Override
     public PrintStream format(Locale l, String format, Object... args) {
-        return super.format(l, format, args);
+        synchronized (this) {
+            if ((formatter == null)
+                    || (formatter.locale() != l))
+                formatter = new Formatter(this, l);
+            formatter.format(l, format, args);
+        }
+        return this;
     }
+
+
+
+
 
     @Override
     public PrintStream append(CharSequence csq) {
-        return super.append(csq);
+        this.print(String.valueOf(csq));
+        return this;
     }
 
     @Override
     public PrintStream append(CharSequence csq, int start, int end) {
-        return super.append(csq, start, end);
+        if (csq == null) csq = "null";
+        return this.append(csq.subSequence(start, end));
     }
 
     @Override
     public PrintStream append(char c) {
-        return super.append(c);
+        this.print(c);
+        return this;
     }
 }
