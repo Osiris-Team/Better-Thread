@@ -15,4 +15,4 @@ Currently only for Windows due to Jansi errors on other platforms.
 * [`UsageExample`](https://github.com/Osiris-Team/Better-Thread/blob/main/src/test/java/UsageExample.java): An example for creating and visualizing BetterThreads.
 
 ## Credits
- - Thanks a lot to @gnodet for his patience https://github.com/fusesource/jansi/issues/195
+ - Thanks a lot to [@gnodet](https://github.com/gnodet) for his help with jansi and jline
