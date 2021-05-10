@@ -9,6 +9,7 @@ import org.jline.utils.Display;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 import static com.osiris.betterthread.Constants.*;
@@ -19,12 +20,44 @@ import static com.osiris.betterthread.Constants.*;
  */
 public class Main {
 
+    private Display initAndGetNewDisplay(){
+        try{
+            System.out.println("CREATED NEW DISPLAY");
+            Display display = new Display(TERMINAL, false);
+            Size size = TERMINAL.getSize(); // Need to initialize the size on the display with
+            display.resize(size.getRows(), size.getColumns());
+            return display;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to initialize Display!");
+        }
+    }
+
     public static void main(String[] args) throws IOException, InterruptedException, JLineLinkException {
-        new Main().betterThreadDisplayerTest();
-        System.out.println("TEST");
+
+        Size newSize = TERMINAL.getSize();
+        newSize.setRows(10);
+        newSize.setColumns(10);
+        TERMINAL.setSize(newSize);
+        /*
+        new Main().testUpdatingMoreLinesThanTerminalHasRows();
+        Display dis1 = new Main().initAndGetNewDisplay();
+        Display dis2 = new Main().initAndGetNewDisplay();
+
+
+
+        Thread.sleep(1000);
+        dis1.update(Collections.singletonList(AttributedString.fromAnsi("Updated display1")), TERMINAL.getSize().getColumns());
+        Thread.sleep(1000);
+        dis2.update(Collections.singletonList(AttributedString.fromAnsi("Updated display2")), -1);
+        Thread.sleep(4000);
+
+        //
+        //new Main().betterThreadDisplayerTest();
+
         //MySection line = new MySection("Your lines content here!", 0);
         //MY_DISPLAY.updateLine(line);
-        /*
+
         PrintStream old = System.out;
         MyPrintStream myPrintStream = new MyPrintStream();
         System.setOut(myPrintStream);
@@ -116,6 +149,7 @@ public class Main {
          */
     }
 
+
     void testUpdatingLimit(){
         for (long i = 0; i < Long.MAX_VALUE; i++) {
             //MY_DISPLAY.add("["+i+"] "+getRandomString());
@@ -140,15 +174,16 @@ public class Main {
 
     private int progress = 0;
 
-
-    void testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages() throws InterruptedException, JLineLinkException {
+    void testUpdatingMoreLinesThanTerminalHasRows() throws JLineLinkException {
         BetterThreadManager manager = new BetterThreadManager();
-
         BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager);
-        //displayer.setRefreshInterval(10);
         displayer.start();
 
-        // Its normal to get values over 100% because of this loop
+        for (int i = 0; i < 20; i++) {
+            BetterThread t = new BetterThread(manager);
+            t.start();
+        }
+
         Thread thread = new Thread(()->{
             try {
                 while (!manager.isFinished())
@@ -160,6 +195,24 @@ public class Main {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        });
+        thread.start();
+    }
+
+    void testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages() throws InterruptedException, JLineLinkException {
+        BetterThreadManager manager = new BetterThreadManager();
+
+        BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager);
+        //displayer.setRefreshInterval(10);
+        displayer.start();
+
+        // Its normal to get values over 100% because of this loop
+        Thread thread = new Thread(()->{
+            while (!manager.isFinished())
+                for (BetterThread t :
+                        manager.getAll()) {
+                    t.step();
+                }
         });
         thread.start();
 

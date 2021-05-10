@@ -10,15 +10,12 @@ package com.osiris.betterthread;
 
 
 import com.osiris.betterthread.exceptions.JLineLinkException;
+import com.osiris.betterthread.jline.Display;
 import com.osiris.betterthread.jline.MyPrintStream;
 import org.fusesource.jansi.Ansi;
-import org.jline.terminal.Size;
 import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedString;
-import org.jline.utils.Display;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,7 +34,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  */
 public class BetterThreadDisplayer extends Thread {
     private Terminal terminal;
-    private Display display;
+    private Display display = new Display();
     private BetterThreadManager manager;
     private String label = "[MyAppName]";
     private String threadLabel = "[PROCESS]";
@@ -105,7 +102,7 @@ public class BetterThreadDisplayer extends Thread {
         this.showDetailedWarnings = showDetailedWarnings;
         this.refreshInterval = refreshInterval;
 
-
+        /*
         try{
             // Init the display/section
             display = new Display(TERMINAL, false);
@@ -114,6 +111,8 @@ public class BetterThreadDisplayer extends Thread {
         } catch (Exception e) {
             throw new JLineLinkException("Failed to initialize JLines Display class! Details: "+e.getMessage());
         }
+
+         */
     }
 
     @Override
@@ -179,7 +178,7 @@ public class BetterThreadDisplayer extends Thread {
             if (thread.isFinished()){
                 if(thread.isSkipped()){
                     builder.append(ansi()
-                            .fg(BLUE).a(" [#] ")
+                            .fg(WHITE).a(" [#] ")
                             .reset());
                 }
                 else if (thread.isSuccess()){
@@ -266,6 +265,7 @@ public class BetterThreadDisplayer extends Thread {
      * @param allWarnings
      */
     private void formatWarnings(List<BetterWarning> allWarnings){
+        TERMINAL.writer().println();
 
         Ansi ansiDate = ansi()
                 .bg(WHITE)
@@ -285,7 +285,7 @@ public class BetterThreadDisplayer extends Thread {
             TERMINAL.writer().println(ansi()
                     .a(ansiDate)
                     .fg(YELLOW)
-                    .a(" There are " + allWarnings.size() + " warnings:")
+                    .a(" Executed tasks. There are " + allWarnings.size() + " warnings.")
                     .reset());
 
             if (showDetailedWarnings) {
@@ -316,17 +316,17 @@ public class BetterThreadDisplayer extends Thread {
         }
         else{
             TERMINAL.writer().println(ansi()
-                    .fg(YELLOW).a(" There are "+ allWarnings.size()+" warnings! Enable 'show-warnings' to view them, or check your log for further details!")
+                    .fg(YELLOW).a(" Executed tasks. There are "+ allWarnings.size()+" warnings. 'show-warnings' is disabled.")
                     .reset());
         }
     }
 
     /**
      * This is the link to the JLine API. <br>
-     * {@link Display} is a section/part/paragraph of the terminal/console made out of lines. <br>
-     * Those lines can get updated/added/removed by the {@link Display} class. <br>
+     * {@link org.jline.utils.Display} is a section/part/paragraph of the terminal/console made out of lines. <br>
+     * Those lines can get updated/added/removed by the {@link org.jline.utils.Display} class. <br>
      * In our case each line represents a {@link BetterThread}s progress <br>
-     * and all those lines are updated/managed by this {@link Display}.
+     * and all those lines are updated/managed by this {@link org.jline.utils.Display}.
      */
     public Display getDisplay() {
         return display;
