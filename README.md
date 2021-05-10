@@ -13,3 +13,6 @@ Currently only for Windows due to Jansi errors on other platforms.
 
 ## Usage
 * [`UsageExample`](https://github.com/Osiris-Team/Better-Thread/blob/main/src/test/java/UsageExample.java): An example for creating and visualizing BetterThreads.
+
+## Credits
+ - Thanks a lot to [@gnodet](https://github.com/gnodet) for his help with jansi and jline
