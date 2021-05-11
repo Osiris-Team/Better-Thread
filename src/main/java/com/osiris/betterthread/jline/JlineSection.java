@@ -14,7 +14,7 @@ import static com.osiris.betterthread.Constants.TERMINAL;
  * we need this class. <br>
  * There is no limit of lines we can update with this class.
  */
-public class Display {
+public class JlineSection {
     private Map<org.jline.utils.Display, List<AttributedString>> displayAndLines = new HashMap<>();
 
     /**
@@ -24,7 +24,7 @@ public class Display {
         return displayAndLines;
     }
 
-    public Display() {
+    public JlineSection() {
         this(null);
     }
 
@@ -32,7 +32,7 @@ public class Display {
      * Init with at least one display. <br>
      * @param display If null we create and init a new one.
      */
-    public Display(org.jline.utils.Display display) {
+    public JlineSection(org.jline.utils.Display display) {
         if (display!=null)
             displayAndLines.put(display, new ArrayList<AttributedString>());
         else

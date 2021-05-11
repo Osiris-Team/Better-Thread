@@ -10,11 +10,13 @@ package com.osiris.betterthread;
 
 
 import com.osiris.betterthread.exceptions.JLineLinkException;
-import com.osiris.betterthread.jline.Display;
+import com.osiris.betterthread.jline.JlineSection;
 import com.osiris.betterthread.jline.MyPrintStream;
 import org.fusesource.jansi.Ansi;
+import org.jline.terminal.Size;
 import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedString;
+import org.jline.utils.Display;
 
 import java.io.PrintStream;
 import java.time.LocalDateTime;
@@ -34,7 +36,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  */
 public class BetterThreadDisplayer extends Thread {
     private Terminal terminal;
-    private Display display = new Display();
+    private Display display;
     private BetterThreadManager manager;
     private String label = "[MyAppName]";
     private String threadLabel = "[PROCESS]";
@@ -102,7 +104,7 @@ public class BetterThreadDisplayer extends Thread {
         this.showDetailedWarnings = showDetailedWarnings;
         this.refreshInterval = refreshInterval;
 
-        /*
+
         try{
             // Init the display/section
             display = new Display(TERMINAL, false);
@@ -112,7 +114,6 @@ public class BetterThreadDisplayer extends Thread {
             throw new JLineLinkException("Failed to initialize JLines Display class! Details: "+e.getMessage());
         }
 
-         */
     }
 
     @Override
