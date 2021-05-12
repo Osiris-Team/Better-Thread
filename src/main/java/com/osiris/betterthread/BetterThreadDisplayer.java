@@ -133,13 +133,14 @@ public class BetterThreadDisplayer extends Thread {
                 sleep(refreshInterval);
             }
 
-            // Restore the output and print missed messages
+            // Restore the output
             System.setOut(originalOut);
-            if (!customOut.getCache1().isEmpty() || !customOut.getCache2().toString().isEmpty()){
-                System.out.println("Missed messages: ");
-                System.out.println(customOut.getCache1());
-                System.out.println(customOut.getCache2().toString());
-            }
+
+            // Print missed messages
+            String c1 = customOut.getCache1().toString();
+            String c2 = customOut.getCache2().toString();
+            if (!c1.trim().isEmpty()) System.out.println(c1);
+            if (!c2.trim().isEmpty()) System.out.println(c2);
 
         } catch (Exception e) {
             e.printStackTrace();
