@@ -135,7 +135,7 @@ public class BetterThread extends Thread implements DisplayableThread {
 
     /**
      * Do NOT use this method to run a thread.
-     * A thread is already started automatically when you create one!
+     * A {@link BetterThread} usually gets started automatically when you create one! See {@link #isAutoStart()} for details.
      * If you want to specify the code this thread should run,
      * use/override the runAtStart() method!
      */
@@ -143,6 +143,8 @@ public class BetterThread extends Thread implements DisplayableThread {
     public void run() {
         try{
             super.run();
+            addToActiveProcesses();
+            started = true;
             runAtStart();
         } catch (Exception e) {
             setSuccess(false);
@@ -159,8 +161,6 @@ public class BetterThread extends Thread implements DisplayableThread {
      */
     public void runAtStart() throws Exception{
         // Override this method when extending this Class in your thread
-        addToActiveProcesses();
-        started = true;
     }
 
     /**
@@ -300,10 +300,17 @@ public class BetterThread extends Thread implements DisplayableThread {
         return success;
     }
 
+    /**
+     * If true, the {@link #runAtStart()} method gets called
+     * in the constructor.
+     */
     public boolean isAutoStart() {
         return autoStart;
     }
 
+    /**
+     * See {@link #isAutoStart()} for details.
+     */
     public void setAutoStart(boolean autoStart) {
         this.autoStart = autoStart;
     }

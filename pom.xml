@@ -14,7 +14,7 @@
 
     <groupId>com.osiris.betterthread</groupId>
     <artifactId>Better-Thread</artifactId>
-    <version>3.0</version>
+    <version>3.1</version>
     <packaging>jar</packaging>
 
     <name>Better-Thread</name>
@@ -41,13 +41,12 @@
 
     <dependencies>
 
+        <!-- TERMINAL STUFF -->
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline-terminal-jansi</artifactId>
             <version>3.19.0</version>
         </dependency>
-
-        <!-- https://github.com/fusesource/jansi -->
         <dependency>
             <groupId>org.fusesource.jansi</groupId>
             <artifactId>jansi</artifactId>
