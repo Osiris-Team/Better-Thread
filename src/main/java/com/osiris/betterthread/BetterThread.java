@@ -225,13 +225,21 @@ public class BetterThread extends Thread implements DisplayableThread {
         setStatus(status);
     }
 
+    public void skip(){
+        skip(null);
+    }
+
     /**
+     * Finishes the thread.
      * Useful when using with a configuration file.
      */
-    public void skip(){
+    public void skip(String status){
         skipped=true;
         finish();
-        setStatus("Skipped...");
+        if (status!=null && !status.trim().isEmpty())
+            setStatus(status);
+        else
+            setStatus("Skipped.");
     }
 
     public void setMin(long min) {
