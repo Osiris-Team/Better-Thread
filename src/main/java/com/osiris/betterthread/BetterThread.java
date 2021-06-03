@@ -35,10 +35,11 @@ public class BetterThread extends Thread implements DisplayableThread {
      * The default values 0(min), 100(max) and 0(now) are used.
      * You can change them by using the set methods or a different constructor.
      * You need to pass over the threadManagers instance.
+     *
      * @param manager the BetterThreadManager.
      */
     public BetterThread(BetterThreadManager manager) {
-        this(null, 0, 100,0, manager);
+        this(null, 0, 100, 0, manager);
     }
 
     /**
@@ -46,15 +47,15 @@ public class BetterThread extends Thread implements DisplayableThread {
      * Auto-start is disabled by default.
      * {@link #BetterThread(BetterThreadManager)}
      */
-    public BetterThread(BetterThreadManager manager, boolean autoStart){
-        this(null, 0, 100,0, manager, autoStart, false);
+    public BetterThread(BetterThreadManager manager, boolean autoStart) {
+        this(null, 0, 100, 0, manager, autoStart, false);
     }
 
     /**
      * {@link #BetterThread(BetterThreadManager)}
      */
-    public BetterThread(BetterThreadManager manager, boolean autoStart, boolean autoFinish){
-        this(null, 0, 100,0, manager, autoStart, autoFinish);
+    public BetterThread(BetterThreadManager manager, boolean autoStart, boolean autoFinish) {
+        this(null, 0, 100, 0, manager, autoStart, autoFinish);
     }
 
 
@@ -63,7 +64,8 @@ public class BetterThread extends Thread implements DisplayableThread {
      * The default values 0(min), 100(max) and 0(now) are used.
      * You can change them by using the set methods or a different constructor.
      * You need to pass over the threadManagers instance.
-     * @param name set this threads name.
+     *
+     * @param name    set this threads name.
      * @param manager the BetterThreadManager.
      */
     public BetterThread(String name, BetterThreadManager manager) {
@@ -73,22 +75,24 @@ public class BetterThread extends Thread implements DisplayableThread {
     /**
      * Creates a new thread. And starts the thread.
      * Min, max and now are int variables.
+     *
      * @param min The minimum. Usually the starting point.
      * @param max The maximum. Usually when the thread finishes.
      * @param now The current progress of the thread.
      */
-    public BetterThread(String name, int min, long max, long now, BetterThreadManager manager){
-        this(name, (long) min, max, now, manager, false, true);
+    public BetterThread(String name, int min, long max, long now, BetterThreadManager manager) {
+        this(name, min, max, now, manager, false, true);
     }
 
     /**
      * Creates a new thread. And starts the thread.
      * Min, max and now are long variables.
-     * @param min The minimum. Usually the starting point.
-     * @param max The maximum. Usually when the thread finishes.
-     * @param now The current progress of the thread.
-     * @param manager The parent ThreadManager this Thread should be added to.
-     * @param autoStart Starts the thread automatically. No need to call the start() method. Default it false.
+     *
+     * @param min        The minimum. Usually the starting point.
+     * @param max        The maximum. Usually when the thread finishes.
+     * @param now        The current progress of the thread.
+     * @param manager    The parent ThreadManager this Thread should be added to.
+     * @param autoStart  Starts the thread automatically. No need to call the start() method. Default it false.
      * @param autoFinish Finishes when the now value equals the max value.
      *                   Its checked every time step()/isFinished() is called.
      *                   Default is true. If you disable this you will have to call the finish() method by yourself.
@@ -104,17 +108,17 @@ public class BetterThread extends Thread implements DisplayableThread {
         initEssentials(name);
     }
 
-    private void initEssentials(String name){
+    private void initEssentials(String name) {
         configureName(name);
         addToProcesses();
         if (autoStart) start();
     }
 
-    private void addToProcesses(){
+    private void addToProcesses() {
         manager.getAll().add(this);
     }
 
-    private void addToActiveProcesses(){
+    private void addToActiveProcesses() {
         manager.getActive().add(this);
     }
 
@@ -122,13 +126,13 @@ public class BetterThread extends Thread implements DisplayableThread {
      * Sets the Threads name.
      * If name = null, we use the Threads count as name: "Thread+number".
      * This is done automatically already.
+     *
      * @param name
      */
-    private void configureName(String name){
-        if (name==null){
+    private void configureName(String name) {
+        if (name == null) {
             setName(this.getClass().getSimpleName());
-        }
-        else{
+        } else {
             setName(name);
         }
     }
@@ -141,14 +145,14 @@ public class BetterThread extends Thread implements DisplayableThread {
      */
     @Override
     public void run() {
-        try{
+        try {
             super.run();
             addToActiveProcesses();
             started = true;
             runAtStart();
         } catch (Exception e) {
             setSuccess(false);
-            if (e.getMessage()!=null) setStatus(e.getMessage());
+            if (e.getMessage() != null) setStatus(e.getMessage());
             getWarnings().add(new BetterWarning(this, e));
         }
     }
@@ -157,18 +161,20 @@ public class BetterThread extends Thread implements DisplayableThread {
      * Override this method and enter the code you want this
      * thread to run!
      * This will be executed in the Threads run() method.
+     *
      * @throws Exception
      */
-    public void runAtStart() throws Exception{
+    public void runAtStart() throws Exception {
         // Override this method when extending this Class in your thread
     }
 
     /**
      * Increments the current (now) value.
      * Also checks if its finished.
+     *
      * @return the incremented now value.
      */
-    public long step(){
+    public long step() {
         this.now++;
         isFinished();
         return now;
@@ -176,11 +182,12 @@ public class BetterThread extends Thread implements DisplayableThread {
 
     /**
      * Get the current values percentage (now/max).
+     *
      * @return
      */
-    public byte getPercent(){
-        if (now==0) return 0; // Protection against division by 0
-        else return (byte) (now*100/max);
+    public byte getPercent() {
+        if (now == 0) return 0; // Protection against division by 0
+        else return (byte) (now * 100 / max);
     }
 
     /**
@@ -190,7 +197,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      * the setSuccess() method or by using the alternate
      * finish() method to set that value.
      */
-    public void finish(){
+    public void finish() {
         setNow(this.getMax());
         manager.getActive().remove(this); // Removes itself from the active threads list
         finished = true;
@@ -200,9 +207,10 @@ public class BetterThread extends Thread implements DisplayableThread {
     /**
      * Executes finish() but also sets the
      * success result.
+     *
      * @param success Did the thread succeeded?
      */
-    public void finish(boolean success){
+    public void finish(boolean success) {
         finish();
         setSuccess(success);
     }
@@ -210,7 +218,7 @@ public class BetterThread extends Thread implements DisplayableThread {
     /**
      * Finishes the thread and sets its status message.
      */
-    public void finish(String status){
+    public void finish(String status) {
         finish();
         setStatus(status);
     }
@@ -219,13 +227,13 @@ public class BetterThread extends Thread implements DisplayableThread {
      * Finishes the thread.
      * Sets status message and success.
      */
-    public void finish(String status, boolean success){
+    public void finish(String status, boolean success) {
         finish();
         setSuccess(success);
         setStatus(status);
     }
 
-    public void skip(){
+    public void skip() {
         skip(null);
     }
 
@@ -233,27 +241,13 @@ public class BetterThread extends Thread implements DisplayableThread {
      * Finishes the thread.
      * Useful when using with a configuration file.
      */
-    public void skip(String status){
-        skipped=true;
+    public void skip(String status) {
+        skipped = true;
         finish();
-        if (status!=null && !status.trim().isEmpty())
+        if (status != null && !status.trim().isEmpty())
             setStatus(status);
         else
             setStatus("Skipped.");
-    }
-
-    public void setMin(long min) {
-        this.min = min;
-    }
-    public void setMax(long max) {
-        this.max = max;
-    }
-    public void setNow(long now) {
-        this.now = now;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     @Override
@@ -261,9 +255,17 @@ public class BetterThread extends Thread implements DisplayableThread {
         return min;
     }
 
+    public void setMin(long min) {
+        this.min = min;
+    }
+
     @Override
     public long getMax() {
         return max;
+    }
+
+    public void setMax(long max) {
+        this.max = max;
     }
 
     @Override
@@ -271,41 +273,51 @@ public class BetterThread extends Thread implements DisplayableThread {
         return now;
     }
 
-    @Override
-    public String getStatus(){
-        return status;
+    public void setNow(long now) {
+        this.now = now;
     }
 
     @Override
-    public boolean isFinished(){
-        if (now ==max){
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    @Override
+    public boolean isFinished() {
+        if (now == max) {
             if (autoFinish) finish();
         }
         return finished;
     }
 
-    public boolean isSkipped(){
+    public boolean isSkipped() {
         return skipped;
-    }
-
-    /**
-     * The default value is true.
-     * When called also finishes the thread.
-     * @param success
-     */
-    public void setSuccess(boolean success){
-        this.success = success;
-        if (!finished) finish();
     }
 
     /**
      * Did the thread finish as planned or not?
      * Default is true.
+     *
      * @return false if an error occurred.
      */
     @Override
     public boolean isSuccess() {
         return success;
+    }
+
+    /**
+     * The default value is true.
+     * When called also finishes the thread.
+     *
+     * @param success
+     */
+    public void setSuccess(boolean success) {
+        this.success = success;
+        if (!finished) finish();
     }
 
     /**
@@ -344,12 +356,12 @@ public class BetterThread extends Thread implements DisplayableThread {
         this.betterWarnings = betterWarnings;
     }
 
-    public void setSummary(List<String> summary) {
-        this.summary = summary;
-    }
-
     public List<String> getSummary() {
         return summary;
+    }
+
+    public void setSummary(List<String> summary) {
+        this.summary = summary;
     }
 
     public BetterThreadManager getManager() {

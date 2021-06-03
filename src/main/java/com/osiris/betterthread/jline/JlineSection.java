@@ -3,11 +3,15 @@ package com.osiris.betterthread.jline;
 import org.jline.terminal.Size;
 import org.jline.utils.AttributedString;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.osiris.betterthread.Constants.TERMINAL;
 
 // TODO WORK IN PROGRESS
+
 /**
  * Manages terminal line updates.
  * Since the limit of lines for one single {@link org.jline.utils.Display} is the terminals height,
@@ -15,7 +19,23 @@ import static com.osiris.betterthread.Constants.TERMINAL;
  * There is no limit of lines we can update with this class.
  */
 public class JlineSection {
-    private Map<org.jline.utils.Display, List<AttributedString>> displayAndLines = new HashMap<>();
+    private final Map<org.jline.utils.Display, List<AttributedString>> displayAndLines = new HashMap<>();
+
+    public JlineSection() {
+        this(null);
+    }
+
+    /**
+     * Init with at least one display. <br>
+     *
+     * @param display If null we create and init a new one.
+     */
+    public JlineSection(org.jline.utils.Display display) {
+        if (display != null)
+            displayAndLines.put(display, new ArrayList<AttributedString>());
+        else
+            displayAndLines.put(initAndGetNewDisplay(), new ArrayList<AttributedString>());
+    }
 
     /**
      * This map contains the {@link org.jline.utils.Display}s and their lines.
@@ -24,25 +44,10 @@ public class JlineSection {
         return displayAndLines;
     }
 
-    public JlineSection() {
-        this(null);
-    }
-
-    /**
-     * Init with at least one display. <br>
-     * @param display If null we create and init a new one.
-     */
-    public JlineSection(org.jline.utils.Display display) {
-        if (display!=null)
-            displayAndLines.put(display, new ArrayList<AttributedString>());
-        else
-            displayAndLines.put(initAndGetNewDisplay(), new ArrayList<AttributedString>());
-    }
-
     /**
      * See {@link #update(List, int)} for details.
      */
-    public synchronized void update(List<AttributedString> newLines){
+    public synchronized void update(List<AttributedString> newLines) {
         this.update(newLines, -1);
     }
 
@@ -55,7 +60,8 @@ public class JlineSection {
      * If we have more lines than the terminal rows,
      * instead of only using one {@link org.jline.utils.Display} we use as many as we need to
      * display all the lines from the newLines list.
-     * @param newLines Old lines get replaced with these.
+     *
+     * @param newLines        Old lines get replaced with these.
      * @param targetCursorPos The cursors position after updating these lines. <br>
      *                        To set it at the start use -1. <br>
      *                        In other words: <br>
@@ -72,7 +78,7 @@ public class JlineSection {
         int currentHeight = newLines.size();
         int maxWidth = TERMINAL.getSize().getColumns();
         int maxHeight = TERMINAL.getSize().getRows() - 20; // -10 because idk
-        if (!(maxHeight<=0) && currentHeight > maxHeight){
+        if (!(maxHeight <= 0) && currentHeight > maxHeight) {
             // maxHeight is not allowed to be 0 or smaller than 0 and
             // currentHeight must be bigger than maxHeight
 
@@ -80,9 +86,9 @@ public class JlineSection {
             int startIndex = 0; // Where to start splitting
             int endIndex = 0; // Where to end splitting
 
-            while(currentHeight > maxHeight){
+            while (currentHeight > maxHeight) {
                 endIndex = endIndex + maxHeight;
-                System.out.println("SUBLIST: "+startIndex+"-"+endIndex);
+                System.out.println("SUBLIST: " + startIndex + "-" + endIndex);
                 setValueAtIndex(loopCount, newLines.subList(startIndex, endIndex));
                 startIndex = endIndex + 1; // +1 so we start at the next char in the next loop
                 currentHeight = currentHeight - maxHeight;
@@ -90,8 +96,8 @@ public class JlineSection {
             }
 
             // Add the last small part of the list
-            setValueAtIndex(loopCount, subList(newLines, startIndex, newLines.size() - 1 )); // -1 because we need the last lines index position
-            System.out.println("SUBLIST: "+startIndex+"-"+(newLines.size() - 1));
+            setValueAtIndex(loopCount, subList(newLines, startIndex, newLines.size() - 1)); // -1 because we need the last lines index position
+            System.out.println("SUBLIST: " + startIndex + "-" + (newLines.size() - 1));
 
         }
 
@@ -105,17 +111,17 @@ public class JlineSection {
         });
     }
 
-    private List<AttributedString> subList(List<AttributedString> parentList, int startIndex, int endIndex){
+    private List<AttributedString> subList(List<AttributedString> parentList, int startIndex, int endIndex) {
 
         List<AttributedString> subList;
-        try{
+        try {
             subList = parentList.subList(startIndex, endIndex);
         } catch (IllegalArgumentException e) {
             // Example: list has 31 lines, but the max is 30. Lines 0-30 have been matched to a display.
             // Remaining is 1 line. What the code above then does is subList(31, 30) which results in an exception.
             // That's why we simply add the last one like this:
             subList = new ArrayList<>();
-            subList.add(parentList.get(parentList.size()-1)); // -1 because we need the last lines index position
+            subList.add(parentList.get(parentList.size() - 1)); // -1 because we need the last lines index position
         }
 
         return subList;
@@ -127,27 +133,27 @@ public class JlineSection {
      * Note that this key won't be created a the given index, but
      * at the next free position of the map. <br>
      */
-    private void setValueAtIndex(int index, List<AttributedString> newLines){
+    private void setValueAtIndex(int index, List<AttributedString> newLines) {
 
         org.jline.utils.Display display = null;
         int i = 0;
         for (org.jline.utils.Display d :
                 displayAndLines.keySet()) {
-            if (i==index){
+            if (i == index) {
                 display = d;
                 break;
             }
             i++;
         }
 
-        if(display!=null) // Replace the existing entry
+        if (display != null) // Replace the existing entry
             displayAndLines.replace(display, newLines);
         else // Create a new entry with new display
             displayAndLines.put(initAndGetNewDisplay(), newLines);
     }
 
-    private org.jline.utils.Display initAndGetNewDisplay(){
-        try{
+    private org.jline.utils.Display initAndGetNewDisplay() {
+        try {
             System.out.println("CREATED NEW DISPLAY");
             TERMINAL.writer().println();
             org.jline.utils.Display display = new org.jline.utils.Display(TERMINAL, false);

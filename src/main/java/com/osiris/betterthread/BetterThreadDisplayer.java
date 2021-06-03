@@ -10,7 +10,6 @@ package com.osiris.betterthread;
 
 
 import com.osiris.betterthread.exceptions.JLineLinkException;
-import com.osiris.betterthread.jline.JlineSection;
 import com.osiris.betterthread.jline.MyPrintStream;
 import org.fusesource.jansi.Ansi;
 import org.jline.terminal.Size;
@@ -25,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.osiris.betterthread.Constants.*;
+import static com.osiris.betterthread.Constants.TERMINAL;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -36,7 +35,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  */
 public class BetterThreadDisplayer extends Thread {
     private Terminal terminal;
-    private Display display;
+    private final Display display;
     private BetterThreadManager manager;
     private String label = "[MyAppName]";
     private String threadLabel = "[PROCESS]";
@@ -52,6 +51,7 @@ public class BetterThreadDisplayer extends Thread {
      * Creates a new ThreadDisplayer with default
      * values set.
      * To customize these values use the other constructor.
+     *
      * @param manager
      */
     public BetterThreadDisplayer(BetterThreadManager manager) throws JLineLinkException {
@@ -85,6 +85,7 @@ public class BetterThreadDisplayer extends Thread {
      * Creates a new ThreadDisplayer.
      * You can customize very aspect of it by
      * passing over the wanted values.
+     *
      * @param manager
      * @param label
      * @param threadLabel
@@ -97,21 +98,21 @@ public class BetterThreadDisplayer extends Thread {
     public BetterThreadDisplayer(BetterThreadManager manager, String label, String threadLabel, DateTimeFormatter formatter,
                                  boolean showWarnings, boolean showDetailedWarnings, int refreshInterval) throws JLineLinkException {
         this.manager = manager;
-        if (label!=null) this.label = label;
-        if (threadLabel !=null) this.threadLabel = threadLabel;
-        if (formatter!=null) this.dateFormatter = formatter;
+        if (label != null) this.label = label;
+        if (threadLabel != null) this.threadLabel = threadLabel;
+        if (formatter != null) this.dateFormatter = formatter;
         this.showWarnings = showWarnings;
         this.showDetailedWarnings = showDetailedWarnings;
         this.refreshInterval = refreshInterval;
 
 
-        try{
+        try {
             // Init the display/section
             display = new Display(TERMINAL, false);
             Size size = TERMINAL.getSize(); // Need to initialize the size on the display with
             display.resize(size.getRows(), size.getColumns());
         } catch (Exception e) {
-            throw new JLineLinkException("Failed to initialize JLines Display class! Details: "+e.getMessage());
+            throw new JLineLinkException("Failed to initialize JLines Display class! Details: " + e.getMessage());
         }
 
     }
@@ -119,7 +120,7 @@ public class BetterThreadDisplayer extends Thread {
     @Override
     public void run() {
         super.run();
-        try{
+        try {
             // Since we don't want any other messages
             // to get printed to the console, while we are doing or stuff,
             // we temporarily set the System.out to a custom PrintStream,
@@ -129,7 +130,7 @@ public class BetterThreadDisplayer extends Thread {
             MyPrintStream customOut = new MyPrintStream();
             System.setOut(customOut);
 
-            while (printAll()){
+            while (printAll()) {
                 sleep(refreshInterval);
             }
 
@@ -137,7 +138,7 @@ public class BetterThreadDisplayer extends Thread {
             System.setOut(originalOut);
 
             // Print missed messages
-            String c1 = customOut.getCache1().toString();
+            String c1 = customOut.getCache1();
             String c2 = customOut.getCache2().toString();
             if (!c1.trim().isEmpty()) System.out.println(c1);
             if (!c2.trim().isEmpty()) System.out.println(c2);
@@ -151,9 +152,10 @@ public class BetterThreadDisplayer extends Thread {
      * Prints the current status of all processes.
      * This method should be used with a pause of 250ms.
      * Returns false when all processes have finished!
+     *
      * @return false when all processes have finished!
      */
-    public boolean printAll(){
+    public boolean printAll() {
 
         // Get current date
         now = LocalDateTime.now();
@@ -170,31 +172,28 @@ public class BetterThreadDisplayer extends Thread {
 
             builder.append(ansi()
                     .bg(WHITE)
-                    .fg(BLACK).a("["+dateFormatter.format(now)+"]")
+                    .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
                     .fg(CYAN).a(label)
                     .fg(BLACK).a(threadLabel)
                     .reset());
 
             //Add the loading animation
 
-            if (thread.isFinished()){
-                if(thread.isSkipped()){
+            if (thread.isFinished()) {
+                if (thread.isSkipped()) {
                     builder.append(ansi()
                             .fg(WHITE).a(" [#] ")
                             .reset());
-                }
-                else if (thread.isSuccess()){
+                } else if (thread.isSuccess()) {
                     builder.append(ansi()
                             .fg(GREEN).a(" [#] ")
                             .reset());
-                }
-                else{
+                } else {
                     builder.append(ansi()
                             .fg(RED).a(" [#] ")
                             .reset());
                 }
-            }
-            else{
+            } else {
                 switch (anim) {
                     case 1:
                         builder.append(ansi().a(" [\\] "));
@@ -216,20 +215,19 @@ public class BetterThreadDisplayer extends Thread {
             final String name = thread.getName();
             final long now = thread.getNow();
             final long max = thread.getMax();
-            final byte percent  = thread.getPercent();
+            final byte percent = thread.getPercent();
             final String status = thread.getStatus();
 
-            if (now > 0){
+            if (now > 0) {
                 if (thread.isSkipped())
                     builder.append(ansi()
-                            .a("> ["+name+"] "+status));
+                            .a("> [" + name + "] " + status));
                 else
                     builder.append(ansi()
-                            .a("> ["+name+"]["+percent+"%] "+status));
-            }
-            else{
+                            .a("> [" + name + "][" + percent + "%] " + status));
+            } else {
                 builder.append(ansi()
-                        .a("> ["+name+"] "+status));
+                        .a("> [" + name + "] " + status));
             }
             builder.append(ansi().reset());
 
@@ -240,13 +238,12 @@ public class BetterThreadDisplayer extends Thread {
         // This must be done outside the for loop otherwise the animation wont work
         anim++;
 
-        if (manager.getAll().size()==0){
+        if (manager.getAll().size() == 0) {
             list.add(AttributedString.fromAnsi("No threads! Waiting..."));
-        }
-        else{
+        } else {
             // This means we finished and should stop looping
             // We print the last warnings message and stop.
-            if (manager.isFinished()){
+            if (manager.isFinished()) {
                 display.update(list, -1); // Update one last time
                 //TERMINAL.writer().println(" ");
                 formatWarnings(manager.getAllWarnings());
@@ -258,32 +255,32 @@ public class BetterThreadDisplayer extends Thread {
         return true;
     }
 
-    private long getPercentage(long now, long max){
-        return (now*100/max);
+    private long getPercentage(long now, long max) {
+        return (now * 100 / max);
     }
 
     /**
      * This is will be shown when all processes finished.
+     *
      * @param allWarnings
      */
-    private void formatWarnings(List<BetterWarning> allWarnings){
+    private void formatWarnings(List<BetterWarning> allWarnings) {
         TERMINAL.writer().println();
 
         Ansi ansiDate = ansi()
                 .bg(WHITE)
-                .fg(BLACK).a("["+dateFormatter.format(now)+"]")
+                .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
                 .fg(CYAN).a(label)
                 .fg(BLACK).a("[SUMMARY]")
                 .reset();
 
-        if (allWarnings.isEmpty()){
+        if (allWarnings.isEmpty()) {
             TERMINAL.writer().println(ansi()
                     .a(ansiDate)
                     .fg(GREEN)
                     .a(" Executed all tasks successfully!")
                     .reset());
-        }
-        else if (showWarnings) {
+        } else if (showWarnings) {
             TERMINAL.writer().println(ansi()
                     .a(ansiDate)
                     .fg(YELLOW)
@@ -301,10 +298,9 @@ public class BetterThreadDisplayer extends Thread {
                                     "][Cause: " + betterWarning.getException().getCause() +
                                     "][Extra: " + betterWarning.getExtraInfo() +
                                     "][Trace: " + Arrays.toString(betterWarning.getException().getStackTrace())).reset());
-                    TERMINAL.writer().println(builder.toString());
+                    TERMINAL.writer().println(builder);
                 }
-            }
-            else {
+            } else {
                 BetterWarning betterWarning;
                 for (int i = 0; i < allWarnings.size(); i++) {
                     betterWarning = allWarnings.get(i);
@@ -312,13 +308,12 @@ public class BetterThreadDisplayer extends Thread {
                     builder.append(ansiDate);
                     builder.append(ansi()
                             .fg(YELLOW).a("[WARNING-" + i + "][" + betterWarning.getThread().getName() + "][Message: " + betterWarning.getException().getMessage() + "]").reset());
-                    TERMINAL.writer().println(builder.toString());
+                    TERMINAL.writer().println(builder);
                 }
             }
-        }
-        else{
+        } else {
             TERMINAL.writer().println(ansi()
-                    .fg(YELLOW).a(" Executed tasks. There are "+ allWarnings.size()+" warnings. 'show-warnings' is disabled.")
+                    .fg(YELLOW).a(" Executed tasks. There are " + allWarnings.size() + " warnings. 'show-warnings' is disabled.")
                     .reset());
         }
     }

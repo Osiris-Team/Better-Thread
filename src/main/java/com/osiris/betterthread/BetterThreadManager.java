@@ -7,6 +7,7 @@
  */
 
 package com.osiris.betterthread;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -47,7 +48,7 @@ public class BetterThreadManager {
      * Convenience method for removing
      * all threads attached to the lists.
      */
-    public void clear(){
+    public void clear() {
         all.clear();
         active.clear();
     }
@@ -55,10 +56,10 @@ public class BetterThreadManager {
     /**
      * Returns true when there is a not started Thread in the list.
      */
-    public boolean threadsPendingStart(){
+    public boolean threadsPendingStart() {
         for (BetterThread t :
                 all) {
-            if (!t.isStarted()){
+            if (!t.isStarted()) {
                 return true;
             }
         }
@@ -69,12 +70,12 @@ public class BetterThreadManager {
      * Returns all warnings from all threads, that were
      * added to this manager.
      */
-    public List<BetterWarning> getAllWarnings(){
+    public List<BetterWarning> getAllWarnings() {
         List<BetterWarning> list = new ArrayList<>();
         for (BetterThread process :
                 all) {
             List<BetterWarning> betterWarnings = process.getWarnings();
-            if (!betterWarnings.isEmpty()){
+            if (!betterWarnings.isEmpty()) {
                 list.addAll(betterWarnings);
             }
         }
@@ -83,9 +84,9 @@ public class BetterThreadManager {
 
     public boolean isFinished() {
         // This means that all tasks have finished
-        if (active.isEmpty()){
+        if (active.isEmpty()) {
             // Check if there are no threads that weren't started yet
-            if (!threadsPendingStart()){
+            if (!threadsPendingStart()) {
                 return finished = true;
             }
         }

@@ -1,18 +1,13 @@
 package com.osiris.betterthread;
 
 import com.osiris.betterthread.exceptions.JLineLinkException;
-import com.osiris.betterthread.jline.MyPrintStream;
 import org.jline.terminal.Size;
-import org.jline.utils.AttributedString;
 import org.jline.utils.Display;
 
 import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Random;
 
-import static com.osiris.betterthread.Constants.*;
+import static com.osiris.betterthread.Constants.TERMINAL;
 
 /**
  * Used for testing stuff in native
@@ -20,26 +15,18 @@ import static com.osiris.betterthread.Constants.*;
  */
 public class Main {
 
-    private Display initAndGetNewDisplay(){
-        try{
-            System.out.println("CREATED NEW DISPLAY");
-            Display display = new Display(TERMINAL, false);
-            Size size = TERMINAL.getSize(); // Need to initialize the size on the display with
-            display.resize(size.getRows(), size.getColumns());
-            return display;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to initialize Display!");
-        }
-    }
+    private final int progress = 0;
 
     public static void main(String[] args) throws IOException, InterruptedException, JLineLinkException {
+        //new Main().testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages();
+        new Main().betterThreadDisplayerTest();
 
+        /*
         Size newSize = TERMINAL.getSize();
         newSize.setRows(10);
         newSize.setColumns(10);
         TERMINAL.setSize(newSize);
-        /*
+
         new Main().testUpdatingMoreLinesThanTerminalHasRows();
         Display dis1 = new Main().initAndGetNewDisplay();
         Display dis2 = new Main().initAndGetNewDisplay();
@@ -149,17 +136,14 @@ public class Main {
          */
     }
 
-
-    void testUpdatingLimit(){
-        for (long i = 0; i < Long.MAX_VALUE; i++) {
-            //MY_DISPLAY.add("["+i+"] "+getRandomString());
-        }
+    // Length 200
+    private static String getRandomString() {
+        return getRandomString(200);
     }
 
-    private static String getRandomString() {
+    private static String getRandomString(int targetStringLength) {
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'
-        int targetStringLength = 200;
         Random random = new Random();
 
         String generatedString = random.ints(leftLimit, rightLimit + 1)
@@ -171,8 +155,24 @@ public class Main {
         return generatedString;
     }
 
+    private Display initAndGetNewDisplay() {
+        try {
+            System.out.println("CREATED NEW DISPLAY");
+            Display display = new Display(TERMINAL, false);
+            Size size = TERMINAL.getSize(); // Need to initialize the size on the display with
+            display.resize(size.getRows(), size.getColumns());
+            return display;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to initialize Display!");
+        }
+    }
 
-    private int progress = 0;
+    void testUpdatingLimit() {
+        for (long i = 0; i < Long.MAX_VALUE; i++) {
+            //MY_DISPLAY.add("["+i+"] "+getRandomString());
+        }
+    }
 
     void testUpdatingMoreLinesThanTerminalHasRows() throws JLineLinkException {
         BetterThreadManager manager = new BetterThreadManager();
@@ -184,7 +184,7 @@ public class Main {
             t.start();
         }
 
-        Thread thread = new Thread(()->{
+        Thread thread = new Thread(() -> {
             try {
                 while (!manager.isFinished())
                     for (BetterThread t :
@@ -207,7 +207,7 @@ public class Main {
         displayer.start();
 
         // Its normal to get values over 100% because of this loop
-        Thread thread = new Thread(()->{
+        Thread thread = new Thread(() -> {
             while (!manager.isFinished())
                 for (BetterThread t :
                         manager.getAll()) {
@@ -230,7 +230,7 @@ public class Main {
         BetterThread t3 = new BetterThread(manager);
         t3.start();
 
-        try{
+        try {
             while (!manager.isFinished())
                 Thread.sleep(1000);
             boolean isWarning = false;
@@ -258,12 +258,13 @@ public class Main {
         displayer.start();
 
         // Its normal to get values over 100% because of this loop
-        Thread thread = new Thread(()->{
+        Thread thread = new Thread(() -> {
             try {
                 while (!manager.isFinished())
                     for (BetterThread t :
                             manager.getAll()) {
                         t.step();
+                        t.setStatus(getRandomString(50));
                         Thread.sleep(10);
                         System.out.println("TEST");
                     }
@@ -273,7 +274,7 @@ public class Main {
         });
         thread.start();
 
-        try{
+        try {
             while (!manager.isFinished())
                 Thread.sleep(1000);
             boolean isWarning = false;

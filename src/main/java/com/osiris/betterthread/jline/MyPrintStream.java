@@ -12,14 +12,14 @@ public class MyPrintStream extends PrintStream {
     // We got 2 caches, because the second one can only hold a small
     // amount of information and thus is used only for the format methods.
     private final StringBuilder cache1 = new StringBuilder(); // Contains all the main stuff
-    private ByteArrayOutputStream cache2; // Only contains stuff from format methods
+    private final ByteArrayOutputStream cache2; // Only contains stuff from format methods
     private Formatter formatter;
 
-    public MyPrintStream(){
+    public MyPrintStream() {
         this(new ByteArrayOutputStream());
     }
 
-    public MyPrintStream(ByteArrayOutputStream cache2){
+    public MyPrintStream(ByteArrayOutputStream cache2) {
         super(cache2);
         this.cache2 = cache2;
     }
@@ -35,7 +35,7 @@ public class MyPrintStream extends PrintStream {
      * The main cache that stores everything except
      * stuff from the format methods.
      */
-    public String getCache1(){
+    public String getCache1() {
         return cache1.toString();
     }
 
@@ -65,7 +65,7 @@ public class MyPrintStream extends PrintStream {
     @Override
     public void write(int b) {
         synchronized (this) {
-            try(CharArrayWriter writer = new CharArrayWriter()){
+            try (CharArrayWriter writer = new CharArrayWriter()) {
                 writer.write(b);
                 cache1.append(writer);
             }
@@ -76,16 +76,14 @@ public class MyPrintStream extends PrintStream {
     public void write(byte[] buf, int off, int len) {
         try {
             synchronized (this) {
-                try(ByteArrayOutputStream tempOut = new ByteArrayOutputStream()){
+                try (ByteArrayOutputStream tempOut = new ByteArrayOutputStream()) {
                     tempOut.write(buf, off, len);
                     cache1.append(tempOut);
                 }
             }
-        }
-        catch (InterruptedIOException x) {
+        } catch (InterruptedIOException x) {
             Thread.currentThread().interrupt();
-        }
-        catch (IOException x) {
+        } catch (IOException x) {
             //trouble = true;
         }
     }
@@ -149,8 +147,6 @@ public class MyPrintStream extends PrintStream {
     }
 
 
-
-
     @Override
     public void println() {
         writeln("");
@@ -202,8 +198,6 @@ public class MyPrintStream extends PrintStream {
     }
 
 
-
-
     @Override
     public PrintStream printf(String format, Object... args) {
         return this.format(format, args);
@@ -237,9 +231,6 @@ public class MyPrintStream extends PrintStream {
         }
         return this;
     }
-
-
-
 
 
     @Override
