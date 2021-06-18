@@ -6,7 +6,7 @@ and [jline](https://github.com/jline/jline3).
  - Support the development by [donating](https://www.paypal.com/donate?hosted_button_id=JNXQCWF2TF9W4)
 
 ## Features
-Currently only for Windows due to Jansi errors on other platforms.
+ - Works on multiple platforms (Windows, Unix, MacOs etc...)
 
 ## Installation
 
