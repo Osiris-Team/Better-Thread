@@ -14,7 +14,7 @@
 
     <groupId>com.osiris.betterthread</groupId>
     <artifactId>Better-Thread</artifactId>
-    <version>3.4</version>
+    <version>3.5</version>
     <packaging>jar</packaging>
 
     <name>Better-Thread</name>
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>com.github.Osiris-Team</groupId>
             <artifactId>jansi</artifactId>
-            <version>-SNAPSHOT</version>
+            <version>c43815b52e</version>
         </dependency>
 
         <dependency>
