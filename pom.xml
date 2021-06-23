@@ -14,7 +14,7 @@
 
     <groupId>com.osiris.betterthread</groupId>
     <artifactId>Better-Thread</artifactId>
-    <version>3.5</version>
+    <version>3.6</version>
     <packaging>jar</packaging>
 
     <name>Better-Thread</name>
@@ -41,17 +41,18 @@
 
     <dependencies>
 
-        <!-- TERMINAL STUFF -->
-        <dependency>
-            <groupId>org.jline</groupId>
-            <artifactId>jline-terminal-jansi</artifactId>
-            <version>3.20.0</version>
-        </dependency>
         <dependency>
             <groupId>com.github.Osiris-Team</groupId>
             <artifactId>jansi</artifactId>
             <version>c43815b52e</version>
         </dependency>
+        <!-- TERMINAL STUFF -->
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>3.20.0</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
