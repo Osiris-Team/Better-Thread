@@ -248,6 +248,7 @@ public class BetterThreadDisplayer extends Thread {
             // We print the last warnings message and stop.
             if (manager.isFinished()) {
                 display.update(list, -1); // Update one last time
+                TERMINAL.writer().println();
                 printResults();
                 return false;
             }
@@ -422,56 +423,63 @@ public class BetterThreadDisplayer extends Thread {
         return manager;
     }
 
-    public void setManager(BetterThreadManager manager) {
+    public BetterThreadDisplayer setManager(BetterThreadManager manager) {
         this.manager = manager;
+        return this;
     }
 
     public String getLabel() {
         return label;
     }
 
-    public void setLabel(String label) {
+    public BetterThreadDisplayer setLabel(String label) {
         this.label = label;
+        return this;
     }
 
     public String getThreadLabel() {
         return threadLabel;
     }
 
-    public void setThreadLabel(String threadLabel) {
+    public BetterThreadDisplayer setThreadLabel(String threadLabel) {
         this.threadLabel = threadLabel;
+        return this;
     }
 
     public boolean isShowWarnings() {
         return showWarnings;
     }
 
-    public void setShowWarnings(boolean showWarnings) {
+    public BetterThreadDisplayer setShowWarnings(boolean showWarnings) {
         this.showWarnings = showWarnings;
+        return this;
     }
 
     public boolean isShowDetailedWarnings() {
         return showDetailedWarnings;
     }
 
-    public void setShowDetailedWarnings(boolean showDetailedWarnings) {
+    public BetterThreadDisplayer setShowDetailedWarnings(boolean showDetailedWarnings) {
         this.showDetailedWarnings = showDetailedWarnings;
+        return this;
     }
 
     public int getRefreshInterval() {
         return refreshInterval;
     }
 
-    public void setRefreshInterval(int refreshInterval) {
+    public BetterThreadDisplayer setRefreshInterval(int refreshInterval) {
         this.refreshInterval = refreshInterval;
+        return this;
     }
 
     public DateTimeFormatter getDateFormatter() {
         return dateFormatter;
     }
 
-    public void setDateFormatter(DateTimeFormatter dateFormatter) {
+    public BetterThreadDisplayer setDateFormatter(DateTimeFormatter dateFormatter) {
         this.dateFormatter = dateFormatter;
+        return this;
     }
 
 }

@@ -260,6 +260,11 @@ public class Main {
         // Its normal to get values over 100% because of this loop
         Thread thread = new Thread(() -> {
             try {
+                for (BetterThread t :
+                        manager.getAll()) {
+                    t.addInfo("This is a sample info text.");
+                    t.addWarning("This is a sample warning!");
+                }
                 while (!manager.isFinished())
                     for (BetterThread t :
                             manager.getAll()) {
