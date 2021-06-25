@@ -40,7 +40,7 @@ class BetterThreadDisplayerTest {
             boolean isWarning = false;
             for (BetterThread t :
                     manager.getAll()) {
-                if (!t.getBetterWarnings().isEmpty())
+                if (!t.getWarnList().isEmpty())
                     isWarning = true;
             }
             assertTrue(!isWarning);

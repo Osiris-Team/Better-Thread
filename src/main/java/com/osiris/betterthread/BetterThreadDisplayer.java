@@ -13,11 +13,11 @@ import com.osiris.betterthread.exceptions.JLineLinkException;
 import com.osiris.betterthread.jline.MyPrintStream;
 import org.fusesource.jansi.Ansi;
 import org.jline.terminal.Size;
-import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedString;
 import org.jline.utils.Display;
 
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -34,7 +34,6 @@ import static org.fusesource.jansi.Ansi.ansi;
  * Runs until there are no more active BetterThreads.
  */
 public class BetterThreadDisplayer extends Thread {
-    private Terminal terminal;
     private final Display display;
     private BetterThreadManager manager;
     private String label = "[MyAppName]";
@@ -184,6 +183,10 @@ public class BetterThreadDisplayer extends Thread {
                     builder.append(ansi()
                             .fg(WHITE).a(" [#] ")
                             .reset());
+                } else if (!thread.getWarnList().isEmpty()) {
+                    builder.append(ansi()
+                            .fg(YELLOW).a(" [" + thread.getWarnList().size() + "] ")
+                            .reset());
                 } else if (thread.isSuccess()) {
                     builder.append(ansi()
                             .fg(GREEN).a(" [#] ")
@@ -245,8 +248,7 @@ public class BetterThreadDisplayer extends Thread {
             // We print the last warnings message and stop.
             if (manager.isFinished()) {
                 display.update(list, -1); // Update one last time
-                //TERMINAL.writer().println(" ");
-                formatWarnings(manager.getAllWarnings());
+                printResults();
                 return false;
             }
         }
@@ -260,13 +262,33 @@ public class BetterThreadDisplayer extends Thread {
     }
 
     /**
-     * This is will be shown when all processes finished.
-     *
-     * @param allWarnings
+     * See {@link #printAndWriteResults(PrintStream, PrintWriter)} for details. <br>
      */
-    private void formatWarnings(List<BetterWarning> allWarnings) {
-        TERMINAL.writer().println();
+    public void printResults() {
+        printAndWriteResults(new PrintStream(TERMINAL.output()), null);
+    }
 
+    /**
+     * See {@link #printAndWriteResults(PrintStream, PrintWriter)} for details. <br>
+     */
+    public void printResults(PrintStream printStream) {
+        printAndWriteResults(printStream, null);
+    }
+
+    /**
+     * See {@link #printAndWriteResults(PrintStream, PrintWriter)} for details. <br>
+     */
+    public void writeResults(PrintWriter printWriter) {
+        printAndWriteResults(null, printWriter);
+    }
+
+    /**
+     * Goes through the managers thread list ({@link BetterThreadManager#getAll()}) and prints/writes their summaries and warnings. <br>
+     * Does not check if the threads are finished. <br>
+     * See {@link #printAndWriteThreadSummary(BetterThread, PrintStream, PrintWriter)} for details. <br>
+     * See {@link #printAndWriteThreadWarnings(BetterThread, PrintStream, PrintWriter)} for details. <br>
+     */
+    public void printAndWriteResults(PrintStream printStream, PrintWriter printWriter) {
         Ansi ansiDate = ansi()
                 .bg(WHITE)
                 .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
@@ -274,47 +296,114 @@ public class BetterThreadDisplayer extends Thread {
                 .fg(BLACK).a("[SUMMARY]")
                 .reset();
 
-        if (allWarnings.isEmpty()) {
-            TERMINAL.writer().println(ansi()
-                    .a(ansiDate)
-                    .fg(GREEN)
-                    .a(" Executed all tasks successfully!")
-                    .reset());
-        } else if (showWarnings) {
-            TERMINAL.writer().println(ansi()
-                    .a(ansiDate)
-                    .fg(YELLOW)
-                    .a(" Executed tasks. There are " + allWarnings.size() + " warnings.")
-                    .reset());
+        for (BetterThread thread :
+                manager.getAll()) {
+            if (thread.getInfoList().size() > 0 || thread.getWarnList().size() > 0) {
+                if (printStream != null)
+                    printStream.println(ansiDate + " " + thread.getName() + ":");
+                if (printWriter != null)
+                    printWriter.println(ansiDate + " " + thread.getName() + ":");
+                printAndWriteThreadSummary(thread, printStream, printWriter);
+                printAndWriteThreadWarnings(thread, printStream, printWriter);
+            }
+        }
+    }
 
+    /**
+     * Prints and writes the summary of the provided {@link BetterThread}. <br>
+     * In most cases the provided {@link PrintStream} represents the output of a console. <br>
+     * In most cases the provided {@link PrintWriter} represents the writer for a log file. <br>
+     * Remember to check if the thread has finished already. <br>
+     *
+     * @param thread      the thread to print/write.
+     * @param printStream the stream to print to. Can be null.
+     * @param printWriter the writer to write with. Can also be null.
+     */
+    public void printAndWriteThreadSummary(BetterThread thread, PrintStream printStream, PrintWriter printWriter) {
+        Ansi ansiDate = ansi()
+                .bg(WHITE)
+                .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
+                .fg(CYAN).a(label)
+                .fg(BLACK).a("[INFO]")
+                .reset();
+        for (String summaryString :
+                thread.getInfoList()) {
+            if (printStream != null)
+                printStream.println(ansiDate + " " + summaryString);
+            if (printWriter != null)
+                printWriter.println(ansiDate + " " + summaryString);
+        }
+    }
+
+    /**
+     * Prints and writes the warnings of the provided {@link BetterThread}. <br>
+     * In most cases the provided {@link PrintStream} represents the output of a console. <br>
+     * In most cases the provided {@link PrintWriter} represents the writer for a log file. <br>
+     * Remember to check if the thread has finished already. <br>
+     *
+     * @param thread      the thread to print/write.
+     * @param printStream the stream to print to. Can be null.
+     * @param printWriter the writer to write with. Can also be null.
+     */
+    public void printAndWriteThreadWarnings(BetterThread thread, PrintStream printStream, PrintWriter printWriter) {
+        Ansi ansiDate = ansi()
+                .bg(WHITE)
+                .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
+                .fg(CYAN).a(label)
+                .fg(YELLOW).a("[WARN]")
+                .reset();
+
+        if (showWarnings) {
             if (showDetailedWarnings) {
-                BetterWarning betterWarning;
-                for (int i = 0; i < allWarnings.size(); i++) {
-                    betterWarning = allWarnings.get(i);
+                for (BetterWarning warning :
+                        thread.getWarnList()) {
                     StringBuilder builder = new StringBuilder();
                     builder.append(ansiDate);
-                    builder.append(ansi()
-                            .fg(YELLOW).a("[WARNING-" + i + "][" + betterWarning.getThread().getName() + "][Message: " + betterWarning.getException().getMessage() +
-                                    "][Cause: " + betterWarning.getException().getCause() +
-                                    "][Extra: " + betterWarning.getExtraInfo() +
-                                    "][Trace: " + Arrays.toString(betterWarning.getException().getStackTrace())).reset());
-                    TERMINAL.writer().println(builder);
+                    if (warning.getException() != null) {
+                        if (warning.getExtraInfo() != null) {
+                            builder.append(ansi()
+                                    .fg(YELLOW).a(" " + warning.getException().getMessage() +
+                                            " (" + warning.getExtraInfo() + ")" +
+                                            " trace: " + Arrays.toString(warning.getException().getStackTrace())).reset());
+                        } else {
+                            builder.append(ansi()
+                                    .fg(YELLOW).a(" " + warning.getException().getMessage() +
+                                            " trace: " + Arrays.toString(warning.getException().getStackTrace())).reset());
+                        }
+
+                    } else {
+                        builder.append(ansi()
+                                .fg(YELLOW).a(" " + warning.getExtraInfo()).reset());
+                    }
+                    if (printStream != null)
+                        printStream.println(builder);
+                    if (printWriter != null)
+                        printWriter.println(builder);
                 }
             } else {
-                BetterWarning betterWarning;
-                for (int i = 0; i < allWarnings.size(); i++) {
-                    betterWarning = allWarnings.get(i);
+                for (BetterWarning warning :
+                        thread.getWarnList()) {
                     StringBuilder builder = new StringBuilder();
                     builder.append(ansiDate);
-                    builder.append(ansi()
-                            .fg(YELLOW).a("[WARNING-" + i + "][" + betterWarning.getThread().getName() + "][Message: " + betterWarning.getException().getMessage() + "]").reset());
-                    TERMINAL.writer().println(builder);
+                    if (warning.getException() != null) {
+                        if (warning.getExtraInfo() != null) {
+                            builder.append(ansi()
+                                    .fg(YELLOW).a(" " + warning.getException().getMessage() + " (" + warning.getExtraInfo()).reset() + ")");
+                        } else {
+                            builder.append(ansi()
+                                    .fg(YELLOW).a(" " + warning.getException().getMessage()).reset());
+                        }
+
+                    } else {
+                        builder.append(ansi()
+                                .fg(YELLOW).a(" " + warning.getExtraInfo()).reset());
+                    }
+                    if (printStream != null)
+                        printStream.println(builder);
+                    if (printWriter != null)
+                        printWriter.println(builder);
                 }
             }
-        } else {
-            TERMINAL.writer().println(ansi()
-                    .fg(YELLOW).a(" Executed tasks. There are " + allWarnings.size() + " warnings. 'show-warnings' is disabled.")
-                    .reset());
         }
     }
 

@@ -236,7 +236,7 @@ public class Main {
             boolean isWarning = false;
             for (BetterThread t :
                     manager.getAll()) {
-                if (!t.getBetterWarnings().isEmpty())
+                if (!t.getWarnList().isEmpty())
                     isWarning = true;
             }
             //assertTrue(!isWarning);
@@ -280,7 +280,7 @@ public class Main {
             boolean isWarning = false;
             for (BetterThread t :
                     manager.getAll()) {
-                if (!t.getBetterWarnings().isEmpty())
+                if (!t.getWarnList().isEmpty())
                     isWarning = true;
             }
             //assertTrue(!isWarning);

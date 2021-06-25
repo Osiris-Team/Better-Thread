@@ -27,8 +27,8 @@ public class BetterThread extends Thread implements DisplayableThread {
     private boolean autoStart = false;
     private boolean autoFinish = true;
     private boolean started = false;
-    private List<BetterWarning> betterWarnings = new ArrayList<>();
-    private List<String> summary = new ArrayList();
+    private List<BetterWarning> warnList = new ArrayList<>();
+    private List<String> infoList = new ArrayList<>();
 
     /**
      * Creates a new thread and runs it.
@@ -343,25 +343,46 @@ public class BetterThread extends Thread implements DisplayableThread {
         this.autoFinish = autoFinish;
     }
 
+    public BetterThread addWarning(String warning) {
+        warnList.add(new BetterWarning(this, warning));
+        return this;
+    }
+
+    public BetterThread addWarning(BetterWarning warning) {
+        warnList.add(warning);
+        return this;
+    }
+
+    /**
+     * Same as {@link #getWarnList()}.
+     */
     @Override
     public List<BetterWarning> getWarnings() {
-        return betterWarnings;
+        return warnList;
     }
 
-    public List<BetterWarning> getBetterWarnings() {
-        return betterWarnings;
+    /**
+     * Same as {@link #getWarnings()}.
+     */
+    public List<BetterWarning> getWarnList() {
+        return warnList;
     }
 
-    public void setBetterWarnings(List<BetterWarning> betterWarnings) {
-        this.betterWarnings = betterWarnings;
+    public void setWarnList(List<BetterWarning> warnList) {
+        this.warnList = warnList;
     }
 
-    public List<String> getSummary() {
-        return summary;
+    public BetterThread addInfo(String info) {
+        this.infoList.add(info);
+        return this;
     }
 
-    public void setSummary(List<String> summary) {
-        this.summary = summary;
+    public List<String> getInfoList() {
+        return infoList;
+    }
+
+    public void setInfoList(List<String> infoList) {
+        this.infoList = infoList;
     }
 
     public BetterThreadManager getManager() {
