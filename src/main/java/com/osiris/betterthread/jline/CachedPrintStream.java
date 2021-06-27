@@ -8,36 +8,44 @@ import java.util.Locale;
  * Caches everything send to this PrintStream
  * instead of printing it.
  */
-public class MyPrintStream extends PrintStream {
-    // We got 2 caches, because the second one can only hold a small
-    // amount of information and thus is used only for the format methods.
-    private final StringBuilder cache1 = new StringBuilder(); // Contains all the main stuff
-    private final ByteArrayOutputStream cache2; // Only contains stuff from format methods
+public class CachedPrintStream extends PrintStream {
+    /**
+     * Should contain everything that was written by this classes methods. <br>
+     * 'Should', because since Java 14+ there are other methods that can be used to write stuff. <br>
+     * If those methods are used, stuff gets written to {@link #cache2}. <br>
+     */
+    private final StringBuilder cache1;
+    /**
+     * Contains information if Java 14+ methods were used to write stuff. <br>
+     * Otherwise all the information you'll need is inside {@link #cache1}.
+     */
+    private final ByteArrayOutputStream cache2;
     private Formatter formatter;
 
-    public MyPrintStream() {
-        this(new ByteArrayOutputStream());
+    public CachedPrintStream() {
+        this(new StringBuilder(), new ByteArrayOutputStream());
     }
 
-    public MyPrintStream(ByteArrayOutputStream cache2) {
+    public CachedPrintStream(StringBuilder cache1, ByteArrayOutputStream cache2) {
         super(cache2);
+        this.cache1 = cache1;
         this.cache2 = cache2;
     }
 
     /**
-     * Only stores stuff from the format methods.
+     * See {@link #cache1} for details.
+     */
+    public String getCache1() {
+        return cache1.toString();
+    }
+
+    /**
+     * See {@link #cache2} for details.
      */
     public ByteArrayOutputStream getCache2() {
         return cache2;
     }
 
-    /**
-     * The main cache that stores everything except
-     * stuff from the format methods.
-     */
-    public String getCache1() {
-        return cache1.toString();
-    }
 
     @Override
     public void flush() {

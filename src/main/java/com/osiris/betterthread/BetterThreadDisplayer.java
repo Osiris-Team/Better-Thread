@@ -10,7 +10,7 @@ package com.osiris.betterthread;
 
 
 import com.osiris.betterthread.exceptions.JLineLinkException;
-import com.osiris.betterthread.jline.MyPrintStream;
+import com.osiris.betterthread.jline.CachedPrintStream;
 import org.fusesource.jansi.Ansi;
 import org.jline.terminal.Size;
 import org.jline.utils.AttributedString;
@@ -38,7 +38,7 @@ public class BetterThreadDisplayer extends Thread {
     private BetterThreadManager manager;
     private String label = "[MyAppName]";
     private String threadLabel = "[PROCESS]";
-    private LocalDateTime now;
+    private LocalDateTime now = LocalDateTime.now();
     private boolean showWarnings;
     private boolean showDetailedWarnings;
     private int refreshInterval;
@@ -126,7 +126,7 @@ public class BetterThreadDisplayer extends Thread {
             // which captures all messages send during this period
             // and prints them when we are done.
             PrintStream originalOut = System.out;
-            MyPrintStream customOut = new MyPrintStream();
+            CachedPrintStream customOut = new CachedPrintStream();
             System.setOut(customOut);
 
             while (printAll()) {
@@ -241,7 +241,7 @@ public class BetterThreadDisplayer extends Thread {
         // This must be done outside the for loop otherwise the animation wont work
         anim++;
 
-        if (manager.getAll().size() == 0) {
+        if (manager.getAll().isEmpty()) {
             list.add(AttributedString.fromAnsi("No threads! Waiting..."));
         } else {
             // This means we finished and should stop looping
@@ -292,7 +292,7 @@ public class BetterThreadDisplayer extends Thread {
     public void printAndWriteResults(PrintStream printStream, PrintWriter printWriter) {
         Ansi ansiDate = ansi()
                 .bg(WHITE)
-                .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
+                .fg(BLACK).a("[" + dateFormatter.format(LocalDateTime.now()) + "]")
                 .fg(CYAN).a(label)
                 .fg(BLACK).a("[SUMMARY]")
                 .reset();
@@ -323,7 +323,7 @@ public class BetterThreadDisplayer extends Thread {
     public void printAndWriteThreadSummary(BetterThread thread, PrintStream printStream, PrintWriter printWriter) {
         Ansi ansiDate = ansi()
                 .bg(WHITE)
-                .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
+                .fg(BLACK).a("[" + dateFormatter.format(LocalDateTime.now()) + "]")
                 .fg(CYAN).a(label)
                 .fg(BLACK).a("[INFO]")
                 .reset();
@@ -349,7 +349,7 @@ public class BetterThreadDisplayer extends Thread {
     public void printAndWriteThreadWarnings(BetterThread thread, PrintStream printStream, PrintWriter printWriter) {
         Ansi ansiDate = ansi()
                 .bg(WHITE)
-                .fg(BLACK).a("[" + dateFormatter.format(now) + "]")
+                .fg(BLACK).a("[" + dateFormatter.format(LocalDateTime.now()) + "]")
                 .fg(CYAN).a(label)
                 .fg(YELLOW).a("[WARN]")
                 .reset();

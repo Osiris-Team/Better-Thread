@@ -82,13 +82,15 @@ public class BetterThreadManager {
         return list;
     }
 
+    /**
+     * It only returns true, if there are no more active threads left and none with a pending start. <br>
+     * IMPORTANT: <br>
+     * If there weren't threads added to this manager yet, this method returns ALSO TRUE. <br>
+     * This is done due to performance reasons. <br>
+     */
     public boolean isFinished() {
-        // This means that all tasks have finished
-        if (active.isEmpty()) {
-            // Check if there are no threads that weren't started yet
-            if (!threadsPendingStart()) {
-                return finished = true;
-            }
+        if (active.isEmpty() && !threadsPendingStart()) {
+            return finished = true;
         }
         return finished = false;
     }

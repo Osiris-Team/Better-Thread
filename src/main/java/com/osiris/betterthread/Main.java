@@ -253,7 +253,7 @@ public class Main {
         t2.start();
         BetterThread t3 = new BetterThread(manager);
         t3.start();
-        BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager);
+        BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager,null, null, null, true);
         //displayer.setRefreshInterval(10);
         displayer.start();
 
