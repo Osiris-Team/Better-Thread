@@ -43,12 +43,11 @@ public class BetterThread extends Thread implements DisplayableThread {
     }
 
     /**
-     * Convenience method for directly starting the thread.
-     * Auto-start is disabled by default.
+     * Convenience method for directly starting the thread, because auto-start is actually false.
      * {@link #BetterThread(BetterThreadManager)}
      */
     public BetterThread(BetterThreadManager manager, boolean autoStart) {
-        this(null, 0, 100, 0, manager, autoStart, false);
+        this(null, 0, 100, 0, manager, autoStart, true);
     }
 
     /**
@@ -150,6 +149,8 @@ public class BetterThread extends Thread implements DisplayableThread {
             addToActiveProcesses();
             started = true;
             runAtStart();
+            if (autoFinish)
+                finish(true);
         } catch (Exception e) {
             setSuccess(false);
             if (e.getMessage() != null) setStatus(e.getMessage());
