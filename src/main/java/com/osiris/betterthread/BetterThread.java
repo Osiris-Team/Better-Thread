@@ -199,10 +199,12 @@ public class BetterThread extends Thread implements DisplayableThread {
      * finish() method to set that value.
      */
     public void finish() {
-        setNow(this.getMax());
-        manager.getActive().remove(this); // Removes itself from the active threads list
-        finished = true;
-        interrupt();
+        if (!finished){
+            setNow(this.getMax());
+            manager.getActive().remove(this); // Removes itself from the active threads list
+            finished = true;
+            interrupt();
+        }
     }
 
     /**
