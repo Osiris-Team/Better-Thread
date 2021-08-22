@@ -155,6 +155,10 @@ public class BetterThread extends Thread implements DisplayableThread {
             setSuccess(false);
             if (e.getMessage() != null) setStatus(e.getMessage());
             getWarnings().add(new BetterWarning(this, e));
+        } catch (Throwable t){
+            setSuccess(false);
+            if (t.getMessage() != null) setStatus(t.getMessage());
+            getWarnings().add(new BetterWarning(this, t));
         }
     }
 

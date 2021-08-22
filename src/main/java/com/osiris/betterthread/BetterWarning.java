@@ -27,8 +27,18 @@ public class BetterWarning {
         this(thread, e, null);
     }
 
+    public BetterWarning(BetterThread thread, Throwable t) {
+        this(thread, t, null);
+    }
+
     public BetterWarning(BetterThread thread, String info) {
         this(thread, null, info);
+    }
+
+    public BetterWarning(BetterThread thread, Throwable t, String extraInfo) {
+        this.thread = thread;
+        this.e = new Exception(t);
+        this.extraInfo = extraInfo;
     }
 
     public BetterWarning(BetterThread thread, Exception e, String extraInfo) {
