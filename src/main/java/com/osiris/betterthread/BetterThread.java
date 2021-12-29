@@ -10,6 +10,7 @@ package com.osiris.betterthread;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * This class was build to be extended.
@@ -29,6 +30,7 @@ public class BetterThread extends Thread implements DisplayableThread {
     private boolean started = false;
     private List<BetterWarning> warnList = new ArrayList<>();
     private List<String> infoList = new ArrayList<>();
+    public Consumer<BetterThread> runAtStart;
 
     /**
      * Creates a new thread and runs it.
@@ -171,6 +173,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      */
     public void runAtStart() throws Exception {
         // Override this method when extending this Class in your thread
+        if (runAtStart!=null) runAtStart.accept(this);
     }
 
     /**

@@ -10,10 +10,11 @@ and [jline](https://github.com/jline/jline3).
 
 ## Installation
 
-[Click here for maven/gradle/sbt/leinigen instructions. Press on the get button.](https://jitpack.io/#Osiris-Team/Better-Thread/)
+[Click here for maven/gradle/sbt/leinigen instructions.](https://jitpack.io/#Osiris-Team/Better-Thread/)
 
 ## Usage
-* [`UsageExample`](https://github.com/Osiris-Team/Better-Thread/blob/main/src/test/java/UsageExample.java): An example for creating and visualizing BetterThreads.
+- [Example how to create a Task, with parent class.](https://github.com/Osiris-Team/Better-Thread/blob/main/src/test/java/UsageExample.java)
+- [Example how to create a Task, without parent class.](https://github.com/Osiris-Team/Better-Thread/blob/main/src/test/java/UsageExample.java)
 
 ## Credits
  - Thanks a lot to [@gnodet](https://github.com/gnodet) for his help with jansi and jline

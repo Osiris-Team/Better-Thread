@@ -6,6 +6,8 @@ import org.jline.utils.Display;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 import static com.osiris.betterthread.Constants.TERMINAL;
 
@@ -247,37 +249,34 @@ public class Main {
 
     void betterThreadDisplayerTest() throws JLineLinkException {
         BetterThreadManager manager = new BetterThreadManager();
-        BetterThread t1 = new BetterThread(manager);
-        t1.start();
-        BetterThread t2 = new BetterThread(manager);
-        t2.start();
-        BetterThread t3 = new BetterThread(manager);
-        t3.start();
+        Consumer<BetterThread> run = thread -> {
+            try {
+                thread.addInfo("This is a sample info text.");
+                thread.addWarning("This is a sample warning!");
+                while (!thread.isFinished()){
+                    Thread.sleep(10);
+                    thread.setStatus(getRandomString(50));
+                    System.out.println("TEST");
+                    thread.step();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        };
         BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager,null, null, null, true);
         //displayer.setRefreshInterval(10);
         displayer.start();
 
-        // Its normal to get values over 100% because of this loop
-        Thread thread = new Thread(() -> {
-            try {
-                for (BetterThread t :
-                        manager.getAll()) {
-                    t.addInfo("This is a sample info text.");
-                    t.addWarning("This is a sample warning!");
-                }
-                while (!manager.isFinished())
-                    for (BetterThread t :
-                            manager.getAll()) {
-                        t.step();
-                        t.setStatus(getRandomString(50));
-                        Thread.sleep(10);
-                        System.out.println("TEST");
-                    }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-        thread.start();
+        BetterThread t1 = new BetterThread(manager);
+        t1.runAtStart = run;
+        t1.start();
+        BetterThread t2 = new BetterThread(manager);
+        t2.runAtStart = run;
+        t2.start();
+        BetterThread t3 = new BetterThread(manager);
+        t3.runAtStart = run;
+        t3.start();
+
 
         try {
             while (!manager.isFinished())
