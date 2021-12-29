@@ -14,7 +14,7 @@ and [jline](https://github.com/jline/jline3).
 
 ## Usage
 - [Example how to create a Task, with parent class.](https://github.com/Osiris-Team/Better-Thread/blob/main/src/test/java/UsageExample.java)
-- [Example how to create a Task, without parent class.](https://github.com/Osiris-Team/Better-Thread/blob/main/src/test/java/UsageExample.java)
+- [Example how to create a Task, without parent class.](https://github.com/Osiris-Team/Better-Thread/blob/main/src/test/java/UsageExample2.java)
 
 ## Credits
  - Thanks a lot to [@gnodet](https://github.com/gnodet) for his help with jansi and jline
