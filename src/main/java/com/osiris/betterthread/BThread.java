@@ -8,6 +8,8 @@
 
 package com.osiris.betterthread;
 
+import com.osiris.betterthread.modules.BThreadPrinterModule;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -16,8 +18,10 @@ import java.util.function.Consumer;
  * This class was build to be extended.
  * It contains the core functionality.
  */
-public class BetterThread extends Thread implements DisplayableThread {
-    private BetterThreadManager manager;
+public class BThread extends Thread implements DisplayableThread {
+    public List<BThreadPrinterModule> printerModules = new ArrayList<>();
+    public Consumer<BThread> runAtStart;
+    private BThreadManager manager;
     private long min;
     private long max;
     private long now;
@@ -28,9 +32,8 @@ public class BetterThread extends Thread implements DisplayableThread {
     private boolean autoStart = false;
     private boolean autoFinish = true;
     private boolean started = false;
-    private List<BetterWarning> warnList = new ArrayList<>();
+    private List<BWarning> warnList = new ArrayList<>();
     private List<String> infoList = new ArrayList<>();
-    public Consumer<BetterThread> runAtStart;
 
     /**
      * Creates a new thread and runs it.
@@ -40,22 +43,22 @@ public class BetterThread extends Thread implements DisplayableThread {
      *
      * @param manager the BetterThreadManager.
      */
-    public BetterThread(BetterThreadManager manager) {
+    public BThread(BThreadManager manager) {
         this(null, 0, 100, 0, manager);
     }
 
     /**
      * Convenience method for directly starting the thread, because auto-start is actually false.
-     * {@link #BetterThread(BetterThreadManager)}
+     * {@link #BThread(BThreadManager)}
      */
-    public BetterThread(BetterThreadManager manager, boolean autoStart) {
+    public BThread(BThreadManager manager, boolean autoStart) {
         this(null, 0, 100, 0, manager, autoStart, true);
     }
 
     /**
-     * {@link #BetterThread(BetterThreadManager)}
+     * {@link #BThread(BThreadManager)}
      */
-    public BetterThread(BetterThreadManager manager, boolean autoStart, boolean autoFinish) {
+    public BThread(BThreadManager manager, boolean autoStart, boolean autoFinish) {
         this(null, 0, 100, 0, manager, autoStart, autoFinish);
     }
 
@@ -69,7 +72,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      * @param name    set this threads name.
      * @param manager the BetterThreadManager.
      */
-    public BetterThread(String name, BetterThreadManager manager) {
+    public BThread(String name, BThreadManager manager) {
         this(name, 0, 100, 0, manager);
     }
 
@@ -81,7 +84,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      * @param max The maximum. Usually when the thread finishes.
      * @param now The current progress of the thread.
      */
-    public BetterThread(String name, int min, long max, long now, BetterThreadManager manager) {
+    public BThread(String name, int min, long max, long now, BThreadManager manager) {
         this(name, min, max, now, manager, false, true);
     }
 
@@ -98,8 +101,8 @@ public class BetterThread extends Thread implements DisplayableThread {
      *                   Its checked every time step()/isFinished() is called.
      *                   Default is true. If you disable this you will have to call the finish() method by yourself.
      */
-    public BetterThread(String name, long min, long max, long now, BetterThreadManager manager,
-                        boolean autoStart, boolean autoFinish) {
+    public BThread(String name, long min, long max, long now, BThreadManager manager,
+                   boolean autoStart, boolean autoFinish) {
         this.min = min;
         this.max = max;
         this.now = now;
@@ -140,7 +143,7 @@ public class BetterThread extends Thread implements DisplayableThread {
 
     /**
      * Do NOT use this method to run a thread.
-     * A {@link BetterThread} usually gets started automatically when you create one! See {@link #isAutoStart()} for details.
+     * A {@link BThread} usually gets started automatically when you create one! See {@link #isAutoStart()} for details.
      * If you want to specify the code this thread should run,
      * use/override the runAtStart() method!
      */
@@ -156,11 +159,11 @@ public class BetterThread extends Thread implements DisplayableThread {
         } catch (Exception e) {
             setSuccess(false);
             if (e.getMessage() != null) setStatus(e.getMessage());
-            getWarnings().add(new BetterWarning(this, e));
-        } catch (Throwable t){
+            getWarnings().add(new BWarning(this, e));
+        } catch (Throwable t) {
             setSuccess(false);
             if (t.getMessage() != null) setStatus(t.getMessage());
-            getWarnings().add(new BetterWarning(this, t));
+            getWarnings().add(new BWarning(this, t));
         }
     }
 
@@ -173,7 +176,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      */
     public void runAtStart() throws Exception {
         // Override this method when extending this Class in your thread
-        if (runAtStart!=null) runAtStart.accept(this);
+        if (runAtStart != null) runAtStart.accept(this);
     }
 
     /**
@@ -206,7 +209,7 @@ public class BetterThread extends Thread implements DisplayableThread {
      * finish() method to set that value.
      */
     public void finish() {
-        if (!finished){
+        if (!finished) {
             setNow(this.getMax());
             manager.getActive().remove(this); // Removes itself from the active threads list
             finished = true;
@@ -353,12 +356,12 @@ public class BetterThread extends Thread implements DisplayableThread {
         this.autoFinish = autoFinish;
     }
 
-    public BetterThread addWarning(String warning) {
-        warnList.add(new BetterWarning(this, warning));
+    public BThread addWarning(String warning) {
+        warnList.add(new BWarning(this, warning));
         return this;
     }
 
-    public BetterThread addWarning(BetterWarning warning) {
+    public BThread addWarning(BWarning warning) {
         warnList.add(warning);
         return this;
     }
@@ -367,22 +370,22 @@ public class BetterThread extends Thread implements DisplayableThread {
      * Same as {@link #getWarnList()}.
      */
     @Override
-    public List<BetterWarning> getWarnings() {
+    public List<BWarning> getWarnings() {
         return warnList;
     }
 
     /**
      * Same as {@link #getWarnings()}.
      */
-    public List<BetterWarning> getWarnList() {
+    public List<BWarning> getWarnList() {
         return warnList;
     }
 
-    public void setWarnList(List<BetterWarning> warnList) {
+    public void setWarnList(List<BWarning> warnList) {
         this.warnList = warnList;
     }
 
-    public BetterThread addInfo(String info) {
+    public BThread addInfo(String info) {
         this.infoList.add(info);
         return this;
     }
@@ -395,11 +398,11 @@ public class BetterThread extends Thread implements DisplayableThread {
         this.infoList = infoList;
     }
 
-    public BetterThreadManager getManager() {
+    public BThreadManager getManager() {
         return manager;
     }
 
-    public void setManager(BetterThreadManager manager) {
+    public void setManager(BThreadManager manager) {
         this.manager = manager;
     }
 

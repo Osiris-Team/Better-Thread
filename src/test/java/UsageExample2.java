@@ -1,6 +1,6 @@
-import com.osiris.betterthread.BetterThread;
-import com.osiris.betterthread.BetterThreadDisplayer;
-import com.osiris.betterthread.BetterThreadManager;
+import com.osiris.betterthread.BThread;
+import com.osiris.betterthread.BThreadPrinter;
+import com.osiris.betterthread.BThreadManager;
 import com.osiris.betterthread.exceptions.JLineLinkException;
 
 import java.util.function.Consumer;
@@ -8,8 +8,8 @@ import java.util.function.Consumer;
 public class UsageExample2 {
 
     public static void main(String[] args) throws JLineLinkException {
-        BetterThreadManager manager = new BetterThreadManager();
-        Consumer<BetterThread> run = thread -> {
+        BThreadManager manager = new BThreadManager();
+        Consumer<BThread> run = thread -> {
             try {
                 thread.addInfo("This is a sample info text."); // Gets printed once all tasks have finished in the summary.
                 thread.addWarning("This is a sample warning!"); // Gets printed once all tasks have finished in the summary.
@@ -23,16 +23,16 @@ public class UsageExample2 {
                 e.printStackTrace();
             }
         };
-        BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager,null, null, null, true);
+        BThreadPrinter displayer = new BThreadPrinter(manager,null);
         displayer.start();
 
-        BetterThread t1 = new BetterThread(manager);
+        BThread t1 = new BThread(manager);
         t1.runAtStart = run;
         t1.start();
-        BetterThread t2 = new BetterThread(manager);
+        BThread t2 = new BThread(manager);
         t2.runAtStart = run;
         t2.start();
-        BetterThread t3 = new BetterThread(manager);
+        BThread t3 = new BThread(manager);
         t3.runAtStart = run;
         t3.start();
     }

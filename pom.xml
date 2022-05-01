@@ -14,7 +14,7 @@
 
     <groupId>com.osiris.betterthread</groupId>
     <artifactId>Better-Thread</artifactId>
-    <version>4.4</version>
+    <version>4.5</version>
     <packaging>jar</packaging>
 
     <name>Better-Thread</name>

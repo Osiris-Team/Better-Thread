@@ -8,9 +8,9 @@
 
 package com.osiris.betterthread;
 
-public class BetterWarning {
+public class BWarning {
 
-    private final BetterThread thread;
+    private final BThread thread;
     private final Exception e;
     private final String extraInfo;
 
@@ -23,25 +23,25 @@ public class BetterWarning {
      * @param thread pass over the thread, so we can get its name.
      * @param e      the Exception.
      */
-    public BetterWarning(BetterThread thread, Exception e) {
+    public BWarning(BThread thread, Exception e) {
         this(thread, e, null);
     }
 
-    public BetterWarning(BetterThread thread, Throwable t) {
+    public BWarning(BThread thread, Throwable t) {
         this(thread, t, null);
     }
 
-    public BetterWarning(BetterThread thread, String info) {
+    public BWarning(BThread thread, String info) {
         this(thread, null, info);
     }
 
-    public BetterWarning(BetterThread thread, Throwable t, String extraInfo) {
+    public BWarning(BThread thread, Throwable t, String extraInfo) {
         this.thread = thread;
         this.e = new Exception(t);
         this.extraInfo = extraInfo;
     }
 
-    public BetterWarning(BetterThread thread, Exception e, String extraInfo) {
+    public BWarning(BThread thread, Exception e, String extraInfo) {
         this.thread = thread;
         this.e = e;
         this.extraInfo = extraInfo;
@@ -52,7 +52,7 @@ public class BetterWarning {
      *
      * @return
      */
-    public BetterThread getThread() {
+    public BThread getThread() {
         return thread;
     }
 

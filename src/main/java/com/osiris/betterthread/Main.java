@@ -6,7 +6,6 @@ import org.jline.utils.Display;
 
 import java.io.IOException;
 import java.util.Random;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 import static com.osiris.betterthread.Constants.TERMINAL;
@@ -177,19 +176,19 @@ public class Main {
     }
 
     void testUpdatingMoreLinesThanTerminalHasRows() throws JLineLinkException {
-        BetterThreadManager manager = new BetterThreadManager();
-        BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager);
+        BThreadManager manager = new BThreadManager();
+        BThreadPrinter displayer = new BThreadPrinter(manager);
         displayer.start();
 
         for (int i = 0; i < 20; i++) {
-            BetterThread t = new BetterThread(manager);
+            BThread t = new BThread(manager);
             t.start();
         }
 
         Thread thread = new Thread(() -> {
             try {
                 while (!manager.isFinished())
-                    for (BetterThread t :
+                    for (BThread t :
                             manager.getAll()) {
                         t.step();
                         Thread.sleep(10);
@@ -202,41 +201,41 @@ public class Main {
     }
 
     void testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages() throws InterruptedException, JLineLinkException {
-        BetterThreadManager manager = new BetterThreadManager();
+        BThreadManager manager = new BThreadManager();
 
-        BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager);
+        BThreadPrinter displayer = new BThreadPrinter(manager);
         //displayer.setRefreshInterval(10);
         displayer.start();
 
         // Its normal to get values over 100% because of this loop
         Thread thread = new Thread(() -> {
             while (!manager.isFinished())
-                for (BetterThread t :
+                for (BThread t :
                         manager.getAll()) {
                     t.step();
                 }
         });
         thread.start();
 
-        BetterThread t1 = new BetterThread(manager);
+        BThread t1 = new BThread(manager);
         t1.start();
         TERMINAL.writer().println("ABUSUIODAS");
         TERMINAL.writer().println("ABUSUIODAassdaS");
         Thread.sleep(2000);
-        BetterThread t2 = new BetterThread(manager);
+        BThread t2 = new BThread(manager);
         t2.start();
         TERMINAL.writer().println("a");
         TERMINAL.writer().println("b");
 
         Thread.sleep(2000);
-        BetterThread t3 = new BetterThread(manager);
+        BThread t3 = new BThread(manager);
         t3.start();
 
         try {
             while (!manager.isFinished())
                 Thread.sleep(1000);
             boolean isWarning = false;
-            for (BetterThread t :
+            for (BThread t :
                     manager.getAll()) {
                 if (!t.getWarnList().isEmpty())
                     isWarning = true;
@@ -248,13 +247,13 @@ public class Main {
     }
 
     void betterThreadDisplayerTest() throws JLineLinkException {
-        BetterThreadManager manager = new BetterThreadManager();
-        Consumer<BetterThread> run = thread -> {
+        BThreadManager manager = new BThreadManager();
+        Consumer<BThread> run = thread -> {
             try {
                 thread.addInfo("This is a sample info text.");
                 thread.addWarning("This is a sample warning!");
-                while (!thread.isFinished()){
-                    Thread.sleep(10);
+                while (!thread.isFinished()) {
+                    Thread.sleep(100);
                     thread.setStatus(getRandomString(50));
                     System.out.println("TEST");
                     thread.step();
@@ -263,17 +262,17 @@ public class Main {
                 e.printStackTrace();
             }
         };
-        BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager,null, null, null, true);
+        BThreadPrinter displayer = new BThreadPrinter(manager, null);
         //displayer.setRefreshInterval(10);
         displayer.start();
 
-        BetterThread t1 = new BetterThread(manager);
+        BThread t1 = new BThread(manager);
         t1.runAtStart = run;
         t1.start();
-        BetterThread t2 = new BetterThread(manager);
+        BThread t2 = new BThread(manager);
         t2.runAtStart = run;
         t2.start();
-        BetterThread t3 = new BetterThread(manager);
+        BThread t3 = new BThread(manager);
         t3.runAtStart = run;
         t3.start();
 
@@ -282,7 +281,7 @@ public class Main {
             while (!manager.isFinished())
                 Thread.sleep(1000);
             boolean isWarning = false;
-            for (BetterThread t :
+            for (BThread t :
                     manager.getAll()) {
                 if (!t.getWarnList().isEmpty())
                     isWarning = true;

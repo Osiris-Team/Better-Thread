@@ -65,6 +65,6 @@ public interface DisplayableThread {
      *
      * @return null if there were no warnings.
      */
-    List<BetterWarning> getWarnings();
+    List<BWarning> getWarnings();
 
 }

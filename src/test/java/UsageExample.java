@@ -1,6 +1,6 @@
-import com.osiris.betterthread.BetterThread;
-import com.osiris.betterthread.BetterThreadDisplayer;
-import com.osiris.betterthread.BetterThreadManager;
+import com.osiris.betterthread.BThread;
+import com.osiris.betterthread.BThreadPrinter;
+import com.osiris.betterthread.BThreadManager;
 import com.osiris.betterthread.exceptions.JLineLinkException;
 
 public class UsageExample {
@@ -8,16 +8,16 @@ public class UsageExample {
     public static void main(String[] args) throws JLineLinkException {
 
         // 1. Create the manager
-        BetterThreadManager manager = new BetterThreadManager();
+        BThreadManager manager = new BThreadManager();
 
         // 2. Create the displayer and pass over the manager
-        BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager);
+        BThreadPrinter displayer = new BThreadPrinter(manager);
 
         // 3. Create your tasks by extending BetterThread and overriding the runAtStart() method
         // Note: This is only for explanation purposes. In production create this class inside a package.
-        class MyFirstTask extends BetterThread{
+        class MyFirstTask extends BThread {
 
-            public MyFirstTask(BetterThreadManager manager, boolean autoStart) {
+            public MyFirstTask(BThreadManager manager, boolean autoStart) {
                 super(manager, autoStart);
             }
 

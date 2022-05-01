@@ -5,25 +5,25 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BetterThreadDisplayerTest {
+class BThreadDisplayerTest {
 
     @Test
     void test() throws JLineLinkException {
-        BetterThreadManager manager = new BetterThreadManager();
-        BetterThread test1 = new BetterThread(manager);
+        BThreadManager manager = new BThreadManager();
+        BThread test1 = new BThread(manager);
         test1.start();
-        BetterThread test2 = new BetterThread(manager);
+        BThread test2 = new BThread(manager);
         test2.start();
-        BetterThread test3 = new BetterThread(manager);
+        BThread test3 = new BThread(manager);
         test3.start();
-        BetterThreadDisplayer displayer = new BetterThreadDisplayer(manager);
+        BThreadPrinter displayer = new BThreadPrinter(manager);
         displayer.start();
 
         // Its normal to get values over 100% because of this loop
         Thread thread = new Thread(()->{
             try {
                 while (!manager.isFinished())
-                    for (BetterThread t :
+                    for (BThread t :
                             manager.getAll()) {
                         t.step();
                         Thread.sleep(10);
@@ -38,7 +38,7 @@ class BetterThreadDisplayerTest {
             while (!manager.isFinished())
                 Thread.sleep(1000);
             boolean isWarning = false;
-            for (BetterThread t :
+            for (BThread t :
                     manager.getAll()) {
                 if (!t.getWarnList().isEmpty())
                     isWarning = true;

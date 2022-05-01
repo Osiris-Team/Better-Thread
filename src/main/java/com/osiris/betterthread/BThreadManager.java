@@ -8,27 +8,52 @@
 
 package com.osiris.betterthread;
 
+import com.osiris.betterthread.exceptions.JLineLinkException;
+import com.osiris.betterthread.modules.BThreadPrinterModule;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 /**
  * Contains information about active
  * and inactive threads.
  */
-public class BetterThreadManager {
-    private List<BetterThread> all = new CopyOnWriteArrayList<>();
-    private List<BetterThread> active = new CopyOnWriteArrayList<>();
+public class BThreadManager {
+    private List<BThread> all = new CopyOnWriteArrayList<>();
+    private List<BThread> active = new CopyOnWriteArrayList<>();
     private boolean finished;
+
+    /**
+     * Runs the provided code in a new thread, attached to this {@link BThreadManager}.
+     */
+    public BThreadManager start(Consumer<BThread> runnable) {
+        BThread t = new BThread(this);
+        t.runAtStart = runnable;
+        t.start();
+        return this;
+    }
+
+    /**
+     * Runs the provided code in a new thread, attached to this {@link BThreadManager}.
+     */
+    public BThreadManager start(Consumer<BThread> runnable, List<BThreadPrinterModule> printerModules) {
+        BThread t = new BThread(this);
+        t.runAtStart = runnable;
+        t.printerModules = printerModules;
+        t.start();
+        return this;
+    }
 
     /**
      * A list containing all current and finished threads.
      */
-    public List<BetterThread> getAll() {
+    public List<BThread> getAll() {
         return all;
     }
 
-    public void setAll(List<BetterThread> all) {
+    public void setAll(List<BThread> all) {
         this.all = all;
     }
 
@@ -36,11 +61,11 @@ public class BetterThreadManager {
      * A list containing all current active threads.
      * A thread removes itself from this list when it finishes running.
      */
-    public List<BetterThread> getActive() {
+    public List<BThread> getActive() {
         return active;
     }
 
-    public void setActive(List<BetterThread> active) {
+    public void setActive(List<BThread> active) {
         this.active = active;
     }
 
@@ -57,7 +82,7 @@ public class BetterThreadManager {
      * Returns true when there is a not started Thread in the list.
      */
     public boolean threadsPendingStart() {
-        for (BetterThread t :
+        for (BThread t :
                 all) {
             if (!t.isStarted()) {
                 return true;
@@ -70,13 +95,13 @@ public class BetterThreadManager {
      * Returns all warnings from all threads, that were
      * added to this manager.
      */
-    public List<BetterWarning> getAllWarnings() {
-        List<BetterWarning> list = new ArrayList<>();
-        for (BetterThread process :
+    public List<BWarning> getAllWarnings() {
+        List<BWarning> list = new ArrayList<>();
+        for (BThread process :
                 all) {
-            List<BetterWarning> betterWarnings = process.getWarnings();
-            if (!betterWarnings.isEmpty()) {
-                list.addAll(betterWarnings);
+            List<BWarning> bWarnings = process.getWarnings();
+            if (!bWarnings.isEmpty()) {
+                list.addAll(bWarnings);
             }
         }
         return list;
@@ -97,5 +122,15 @@ public class BetterThreadManager {
 
     public void setFinished(boolean finished) {
         this.finished = finished;
+    }
+
+    /**
+     * Starts a printer thread that prints thread data to the terminal
+     * until this manager has no more running threads.
+     */
+    public BThreadPrinter startPrinter() throws JLineLinkException {
+        BThreadPrinter printer = new BThreadPrinter(this);
+        printer.start();
+        return printer;
     }
 }
