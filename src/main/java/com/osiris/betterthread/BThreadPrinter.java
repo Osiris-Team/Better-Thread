@@ -12,7 +12,7 @@ package com.osiris.betterthread;
 import com.osiris.betterthread.exceptions.JLineLinkException;
 import com.osiris.betterthread.jline.CachedPrintStream;
 import com.osiris.betterthread.modules.BThreadPrinterModule;
-import com.osiris.betterthread.modules.BuilderBThreadModules;
+import com.osiris.betterthread.modules.BThreadModulesBuilder;
 import org.jline.terminal.Size;
 import org.jline.utils.AttributedString;
 import org.jline.utils.Display;
@@ -36,8 +36,9 @@ public class BThreadPrinter extends Thread {
      * If the thread to be printed has no {@link BThread#printerModules} then,
      * these get used as fallback.
      */
-    public List<BThreadPrinterModule> defaultPrinterModules = new BuilderBThreadModules()
+    public List<BThreadPrinterModule> defaultPrinterModules = new BThreadModulesBuilder()
             .date().spinner().status().build();
+    public boolean clearLinesOnFinish = false;
     private BThreadManager manager;
     private final LocalDateTime now = LocalDateTime.now();
     private boolean showWarnings;
@@ -109,7 +110,7 @@ public class BThreadPrinter extends Thread {
             while (printAll()) {
                 sleep(refreshInterval);
             }
-            display.update(new ArrayList<>(), -1); // Clear lines
+            if(clearLinesOnFinish) display.update(new ArrayList<>(), -1); // Clear lines
 
             // Restore the output
             System.setOut(originalOut);
@@ -148,7 +149,7 @@ public class BThreadPrinter extends Thread {
         } else {
             if (manager.isFinished()) {
                 display.update(linesToPrint, -1); // Update one last time
-                TERMINAL.writer().println();
+                if(!linesToPrint.get(linesToPrint.size()-1).contains('\n')) TERMINAL.writer().println();
                 return false;
             }
         }

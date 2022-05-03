@@ -1,7 +1,6 @@
 import com.osiris.betterthread.BThreadManager;
-import com.osiris.betterthread.BThreadPrinter;
 import com.osiris.betterthread.exceptions.JLineLinkException;
-import com.osiris.betterthread.modules.BuilderBThreadModules;
+import com.osiris.betterthread.modules.BThreadModulesBuilder;
 import org.junit.jupiter.api.Test;
 
 public class QuickStartExample {
@@ -14,6 +13,6 @@ public class QuickStartExample {
                 thread.setStatus("Climbing stairs... Step: "+ i);
                 thread.step();
             }
-        }, new BuilderBThreadModules().date().spinner().status().build());
+        }, new BThreadModulesBuilder().date().spinner().status().build());
     }
 }

@@ -8,39 +8,39 @@ import java.util.List;
 /**
  * Utility class to build a printer modules list easier and faster.
  */
-public class BuilderBThreadModules {
+public class BThreadModulesBuilder {
     public List<BThreadPrinterModule> list = new ArrayList<>();
 
     public List<BThreadPrinterModule> build() {
         return list;
     }
 
-    public BuilderBThreadModules custom(BThreadPrinterModule module) {
+    public BThreadModulesBuilder custom(BThreadPrinterModule module) {
         this.list.add(module);
         return this;
     }
 
-    public BuilderBThreadModules date() {
+    public BThreadModulesBuilder date() {
         list.add(new Date());
         return this;
     }
 
-    public BuilderBThreadModules text(Ansi s) {
+    public BThreadModulesBuilder text(Ansi s) {
         list.add(new Text(s));
         return this;
     }
 
-    public BuilderBThreadModules space() {
+    public BThreadModulesBuilder space() {
         list.add(new Space());
         return this;
     }
 
-    public BuilderBThreadModules spinner() {
+    public BThreadModulesBuilder spinner() {
         list.add(new Spinner());
         return this;
     }
 
-    public BuilderBThreadModules status() {
+    public BThreadModulesBuilder status() {
         list.add(new Status());
         return this;
     }

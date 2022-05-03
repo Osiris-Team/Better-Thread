@@ -1,6 +1,7 @@
 package com.osiris.betterthread;
 
 import com.osiris.betterthread.exceptions.JLineLinkException;
+import com.osiris.betterthread.modules.BThreadModulesBuilder;
 import org.jline.terminal.Size;
 import org.jline.utils.Display;
 
@@ -21,6 +22,8 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException, JLineLinkException {
         //new Main().testNewThreadsGettingAddedWithTimeDelayAndInterveningMessages();
         new Main().betterThreadDisplayerTest();
+
+
 
         /*
         Size newSize = TERMINAL.getSize();
@@ -267,6 +270,7 @@ public class Main {
         displayer.start();
 
         BThread t1 = new BThread(manager);
+        t1.printerModules = new BThreadModulesBuilder().build();
         t1.runAtStart = run;
         t1.start();
         BThread t2 = new BThread(manager);
