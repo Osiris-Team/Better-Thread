@@ -18,10 +18,10 @@ import org.jline.utils.AttributedString;
 import org.jline.utils.Display;
 
 import java.io.PrintStream;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.osiris.betterthread.Constants.TERMINAL;
 
@@ -31,7 +31,7 @@ import static com.osiris.betterthread.Constants.TERMINAL;
  * Runs until there are no more active BetterThreads.
  */
 public class BThreadPrinter extends Thread {
-    private final Display display;
+    public final Display display;
     /**
      * If the thread to be printed has no {@link BThread#printerModules} then,
      * these get used as fallback.
@@ -39,14 +39,10 @@ public class BThreadPrinter extends Thread {
     public List<BThreadPrinterModule> defaultPrinterModules = new BThreadModulesBuilder()
             .date().spinner().status().build();
     public boolean clearLinesOnFinish = false;
-    private BThreadManager manager;
-    private final LocalDateTime now = LocalDateTime.now();
-    private boolean showWarnings;
-    private boolean showDetailedWarnings;
-    private int refreshInterval;
-    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
-    private byte anim;
+    public BThreadManager manager;
+    public final List<Runnable> onFinish = new CopyOnWriteArrayList<>();
+    public int refreshInterval;
+    public DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /**
      * Creates a new ThreadDisplayer with default
@@ -60,26 +56,15 @@ public class BThreadPrinter extends Thread {
     }
 
     public BThreadPrinter(BThreadManager manager, DateTimeFormatter formatter) throws JLineLinkException {
-        this(manager, formatter, false);
-    }
-
-    public BThreadPrinter(BThreadManager manager, DateTimeFormatter formatter, boolean showWarnings) throws JLineLinkException {
-        this(manager, formatter, showWarnings, false);
-    }
-
-    public BThreadPrinter(BThreadManager manager, DateTimeFormatter formatter, boolean showWarnings, boolean showDetailedWarnings) throws JLineLinkException {
-        this(manager, formatter, showWarnings, showDetailedWarnings, 250);
+        this(manager, formatter, 250);
     }
 
     /**
      * @throws RuntimeException if there was an error getting the systems terminal.
      */
-    public BThreadPrinter(BThreadManager manager, DateTimeFormatter formatter,
-                          boolean showWarnings, boolean showDetailedWarnings, int refreshInterval) throws JLineLinkException {
+    public BThreadPrinter(BThreadManager manager, DateTimeFormatter formatter, int refreshInterval) throws JLineLinkException {
         this.manager = manager;
         if (formatter != null) this.dateFormatter = formatter;
-        this.showWarnings = showWarnings;
-        this.showDetailedWarnings = showDetailedWarnings;
         this.refreshInterval = refreshInterval;
         try {
             // Init the display/section
@@ -110,7 +95,6 @@ public class BThreadPrinter extends Thread {
             while (printAll()) {
                 sleep(refreshInterval);
             }
-            if(clearLinesOnFinish) display.update(new ArrayList<>(), -1); // Clear lines
 
             // Restore the output
             System.setOut(originalOut);
@@ -120,6 +104,12 @@ public class BThreadPrinter extends Thread {
             String c2 = customOut.getCache2().toString();
             if (!c1.trim().isEmpty()) System.out.println(c1);
             if (!c2.trim().isEmpty()) System.out.println(c2);
+
+            printAll();
+
+            for (Runnable runnable : onFinish) {
+                runnable.run();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -150,16 +140,13 @@ public class BThreadPrinter extends Thread {
             if (manager.isFinished()) {
                 display.update(linesToPrint, -1); // Update one last time
                 if(!linesToPrint.get(linesToPrint.size()-1).contains('\n')) TERMINAL.writer().println();
+                if(clearLinesOnFinish) display.update(new ArrayList<>(), -1); // Clear lines
                 return false;
             }
         }
 
         display.update(linesToPrint, -1);
         return true;
-    }
-
-    private long getPercentage(long now, long max) {
-        return (now * 100 / max);
     }
 
     /**
@@ -179,24 +166,6 @@ public class BThreadPrinter extends Thread {
 
     public BThreadPrinter setManager(BThreadManager manager) {
         this.manager = manager;
-        return this;
-    }
-
-    public boolean isShowWarnings() {
-        return showWarnings;
-    }
-
-    public BThreadPrinter setShowWarnings(boolean showWarnings) {
-        this.showWarnings = showWarnings;
-        return this;
-    }
-
-    public boolean isShowDetailedWarnings() {
-        return showDetailedWarnings;
-    }
-
-    public BThreadPrinter setShowDetailedWarnings(boolean showDetailedWarnings) {
-        this.showDetailedWarnings = showDetailedWarnings;
         return this;
     }
 

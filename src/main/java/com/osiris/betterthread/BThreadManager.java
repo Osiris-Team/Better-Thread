@@ -81,7 +81,7 @@ public class BThreadManager {
     /**
      * Returns true when there is a not started Thread in the list.
      */
-    public boolean threadsPendingStart() {
+    public boolean hasThreadsPendingStart() {
         for (BThread t :
                 all) {
             if (!t.isStarted()) {
@@ -108,13 +108,27 @@ public class BThreadManager {
     }
 
     /**
+     * Returns the average completion percentage of all active threads.
+     */
+    public byte getAveragePercentageDone() {
+        int averagePercentage = 0;
+        int count = 0;
+        for (BThread t : active) {
+            averagePercentage += t.getPercent();
+            count++;
+        }
+        if(count > 1)
+            averagePercentage = averagePercentage / count;
+        return (byte) averagePercentage;
+    }
+
+    /**
      * It only returns true, if there are no more active threads left and none with a pending start. <br>
      * IMPORTANT: <br>
      * If there weren't threads added to this manager yet, this method returns ALSO TRUE. <br>
-     * This is done due to performance reasons. <br>
      */
     public boolean isFinished() {
-        if (active.isEmpty() && !threadsPendingStart()) {
+        if (active.isEmpty() && !hasThreadsPendingStart()) {
             return finished = true;
         }
         return finished = false;
