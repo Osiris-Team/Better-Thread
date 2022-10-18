@@ -39,6 +39,15 @@ public class BThreadPrinter extends Thread {
     public List<BThreadPrinterModule> defaultPrinterModules = new BThreadModulesBuilder()
             .date().spinner().status().build();
     public boolean clearLinesOnFinish = false;
+    /**
+     * When printer is running regular output {@link System#out} will be hidden
+     * and restored by {@link #printMissedRegularOutput}.
+     */
+    public boolean hideRegularOutput = true;
+    /**
+     * If true prints the missed messages from the hidden regular output.
+     */
+    public boolean printMissedRegularOutput = true;
     public BThreadManager manager;
     public final List<Runnable> onFinish = new CopyOnWriteArrayList<>();
     public int refreshInterval;
@@ -89,21 +98,28 @@ public class BThreadPrinter extends Thread {
             // which captures all messages send during this period
             // and prints them when we are done.
             PrintStream originalOut = System.out;
-            CachedPrintStream customOut = new CachedPrintStream();
-            System.setOut(customOut);
+            CachedPrintStream customOut = null;
+            if(hideRegularOutput){
+                customOut = new CachedPrintStream();
+                System.setOut(customOut);
+            }
 
             while (printAll()) {
                 sleep(refreshInterval);
             }
 
-            // Restore the output
-            System.setOut(originalOut);
+            if(customOut != null){
+                // Restore the output
+                System.setOut(originalOut);
+            }
 
             // Print missed messages
-            String c1 = customOut.getCache1();
-            String c2 = customOut.getCache2().toString();
-            if (!c1.trim().isEmpty()) System.out.println(c1);
-            if (!c2.trim().isEmpty()) System.out.println(c2);
+            if(customOut != null && printMissedRegularOutput){
+                String c1 = customOut.getCache1();
+                String c2 = customOut.getCache2().toString();
+                if (!c1.trim().isEmpty()) System.out.print(c1);
+                if (!c2.trim().isEmpty()) System.out.print(c2);
+            }
 
             printAll();
 
