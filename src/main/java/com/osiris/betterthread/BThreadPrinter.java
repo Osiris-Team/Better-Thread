@@ -31,7 +31,7 @@ import static com.osiris.betterthread.Constants.TERMINAL;
  * Runs until there are no more active BetterThreads.
  */
 public class BThreadPrinter extends Thread {
-    public final Display display;
+    public Display display = null;
     /**
      * If the thread to be printed has no {@link BThread#printerModules} then,
      * these get used as fallback.
@@ -65,16 +65,20 @@ public class BThreadPrinter extends Thread {
     }
 
     public BThreadPrinter(BThreadManager manager, DateTimeFormatter formatter) throws JLineLinkException {
-        this(manager, formatter, 250);
+        this(manager, formatter, 250, true);
     }
 
     /**
      * @throws RuntimeException if there was an error getting the systems terminal.
      */
-    public BThreadPrinter(BThreadManager manager, DateTimeFormatter formatter, int refreshInterval) throws JLineLinkException {
+    public BThreadPrinter(BThreadManager manager, DateTimeFormatter formatter, int refreshInterval, boolean initDisplay) throws JLineLinkException {
         this.manager = manager;
         if (formatter != null) this.dateFormatter = formatter;
         this.refreshInterval = refreshInterval;
+        if(initDisplay) initDisplay();
+    }
+
+    public void initDisplay() throws JLineLinkException {
         try {
             // Init the display/section
             display = new Display(TERMINAL, false);
@@ -85,7 +89,6 @@ public class BThreadPrinter extends Thread {
             ex.setStackTrace(e.getStackTrace());
             throw ex;
         }
-
     }
 
     @Override
